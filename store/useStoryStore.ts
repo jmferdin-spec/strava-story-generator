@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import type {
   StravaActivity, StoryConfig, TemplateId, FontFamily, FontWeight,
-  StatAlignment, RoutePosition, OverlayType, StatPosition,
+  StatAlignment, RoutePosition, OverlayType, StatPosition, UnitSystem,
 } from '@/types';
 import { DEFAULT_CONFIG } from '@/lib/storyTemplates';
 
@@ -77,6 +77,9 @@ interface StoryState {
   setRoutePosition: (position: RoutePosition) => void;
   setRouteGlowIntensity: (intensity: number) => void;
 
+  // Config — units
+  setUnits: (units: UnitSystem) => void;
+
   resetConfig: () => void;
 
   // Export
@@ -146,6 +149,8 @@ export const useStoryStore = create<StoryState>()(
     setRouteOpacity: (opacity) => set((s) => { s.config.routeOpacity = opacity; }),
     setRoutePosition: (position) => set((s) => { s.config.routePosition = position; }),
     setRouteGlowIntensity: (intensity) => set((s) => { s.config.routeGlowIntensity = intensity; }),
+
+    setUnits: (units) => set((s) => { s.config.units = units; }),
 
     resetConfig: () => set((s) => {
       const activity = s.config.activity;
