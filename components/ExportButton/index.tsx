@@ -36,23 +36,27 @@ export default function ExportButton({ fullWidth = false }: { fullWidth?: boolea
         : 'strava-story';
       const fileName = `${activityName}-story.png`;
 
-      // On mobile, use Web Share API for Instagram etc. On desktop, direct download.
+      // Always save the file first
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      // On mobile, also open share sheet for Instagram etc.
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       const file = new File([blob], fileName, { type: 'image/png' });
       if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: 'My Strava Story',
-          text: 'Generated with StoryRun',
-        });
-      } else {
-        // Desktop / browsers without share API: trigger download
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'My Strava Story',
+            text: 'Generated with StoryRun',
+          });
+        } catch {
+          // User cancelled share sheet — that's fine, file is already saved
+        }
       }
 
       URL.revokeObjectURL(url);
