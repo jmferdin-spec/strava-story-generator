@@ -12,10 +12,11 @@ import StatControls from '@/components/StatControls';
 import RouteControls from '@/components/RouteControls';
 import ImageUploader from '@/components/ImageUploader';
 import ExportButton from '@/components/ExportButton';
+import StoryGallery from '@/components/StoryGallery';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type MobileScreen = 'runs' | 'preview' | 'edit';
-type EditTab = 'template' | 'photo' | 'style' | 'stats' | 'route';
+type EditTab = 'template' | 'photo' | 'style' | 'stats' | 'route' | 'generate';
 type DesktopTab = EditTab;
 
 // ─── Mobile bottom nav icon ───────────────────────────────────────────────────
@@ -54,6 +55,7 @@ function EditTabContent({ tab }: { tab: EditTab }) {
       )}
       {tab === 'stats' && <StatControls />}
       {tab === 'route' && <RouteControls />}
+      {tab === 'generate' && <StoryGallery />}
     </div>
   );
 }
@@ -65,6 +67,7 @@ const EDIT_TABS: { id: EditTab; label: string }[] = [
   { id: 'style',    label: 'Style' },
   { id: 'stats',    label: 'Stats' },
   { id: 'route',    label: 'Route' },
+  { id: 'generate', label: 'Generate' },
 ];
 
 function EditTabBar({
