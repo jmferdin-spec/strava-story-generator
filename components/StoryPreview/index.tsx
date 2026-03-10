@@ -163,7 +163,7 @@ function DragHandle({ position, scale, onDragEnd, snapping, onSnappingChange }: 
       {isDragging && (
         <>
           <div className="absolute" style={{
-            left: '50%', top: 0, bottom: 0,
+            left: '50%', bottom: 0,
             width: 1, background: 'rgba(252,76,2,0.5)',
             transform: 'translateX(-50%)',
             height: STORY_HEIGHT * scale,
