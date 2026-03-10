@@ -41,6 +41,8 @@ export interface StravaActivity {
 
 // ─── Story Config Types ────────────────────────────────────────────────────────
 
+export type UnitSystem = 'metric' | 'imperial';
+
 export type TemplateId =
   | 'minimal-bottom'
   | 'large-center'
@@ -118,6 +120,7 @@ export interface StoryConfig {
   routePosition: RoutePosition;
   routeGlowIntensity: number;
   statVerticalOffset: number;
+  units: UnitSystem;
 }
 
 export interface StoryTemplate {
