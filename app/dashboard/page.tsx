@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStoryStore } from '@/store/useStoryStore';
 import ActivitySelector from '@/components/ActivitySelector';
@@ -351,19 +351,20 @@ export default function DashboardPage() {
   );
 }
 
-// ─── Mobile activity selector wrapper ────────────────────────────────────────
-// Wraps ActivitySelector and fires callback when an activity is tapped
 function MobileActivitySelector({ onSelect }: { onSelect: () => void }) {
+  const onSelectRef = useRef(onSelect);
+  onSelectRef.current = onSelect;
+
   useEffect(() => {
     const originalFn = useStoryStore.getState().selectActivity;
     useStoryStore.setState({
       selectActivity: (activity: Parameters<typeof originalFn>[0]) => {
         originalFn(activity);
-        onSelect();
+        onSelectRef.current();
       },
     });
     return () => useStoryStore.setState({ selectActivity: originalFn });
-  }, [onSelect]);
+  }, []);
 
   return <ActivitySelector />;
 }
