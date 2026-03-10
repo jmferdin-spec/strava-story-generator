@@ -164,7 +164,7 @@ async function renderLocally(
     });
     await browser.close();
 
-    return new NextResponse(screenshot as Buffer, {
+    return new NextResponse(new Uint8Array(screenshot), {
       status: 200,
       headers: {
         'Content-Type':        'image/png',
