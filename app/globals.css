@@ -1,0 +1,275 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --orange: #FC4C02;
+  --orange-dim: rgba(252, 76, 2, 0.15);
+  --surface: #111113;
+  --surface-2: #18181B;
+  --surface-3: #1E1E22;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-bright: rgba(255, 255, 255, 0.12);
+  --text: #E8E8EA;
+  --text-muted: #6B6B78;
+  --text-subtle: #3A3A44;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-display);
+  background: #0A0A0B;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Panel glass effect */
+.panel {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+/* Glow effects */
+.glow-orange {
+  box-shadow: 0 0 24px rgba(252, 76, 2, 0.3);
+}
+
+/* Input base styles */
+.input-base {
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+.input-base:focus {
+  border-color: rgba(252, 76, 2, 0.5);
+}
+
+/* Slider track */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+}
+
+input[type="range"]::-webkit-slider-track {
+  background: var(--surface-3);
+  height: 4px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--orange);
+  margin-top: -6px;
+  transition: transform 0.1s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+input[type="range"]::-moz-range-track {
+  background: var(--surface-3);
+  height: 4px;
+  border-radius: 2px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--orange);
+  border: none;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Shimmer loading effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 0%,
+    var(--surface-3) 50%,
+    var(--surface-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Section label */
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* ─── Drag & grid enhancements ─────────────────────────────────────────────── */
+
+/* Smooth crosshair cursor during drag */
+.dragging * { cursor: grabbing !important; }
+
+/* Grid snap highlight pulse */
+@keyframes snapPulse {
+  0%   { transform: scale(1);   opacity: 1; }
+  50%  { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+.snap-pulse {
+  animation: snapPulse 0.2s ease;
+}
+
+/* Preview fade on update */
+@keyframes previewUpdate {
+  0%   { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+
+.preview-updating {
+  animation: previewUpdate 0.25s ease forwards;
+}
+
+/* Route glow canvas shimmer */
+@keyframes glowPulse {
+  0%, 100% { filter: brightness(1); }
+  50%       { filter: brightness(1.08); }
+}
+
+/* Font preview load-in */
+@keyframes fontReveal {
+  from { opacity: 0; transform: translateX(-4px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.font-item-enter {
+  animation: fontReveal 0.2s ease forwards;
+}
+
+/* Smooth panel tab underline */
+.tab-active-bar {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Drag handle hover ring pulse */
+@keyframes handlePulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(252,76,2,0.1); }
+  50%       { box-shadow: 0 0 0 6px rgba(252,76,2,0.05); }
+}
+
+.drag-handle:hover {
+  animation: handlePulse 1.5s ease-in-out infinite;
+}
+
+/* ─── Mobile / PWA ─────────────────────────────────────────────────────────── */
+
+/* Safe area padding for phones with notches / home bar */
+.safe-top    { padding-top:    env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-left   { padding-left:   env(safe-area-inset-left); }
+.safe-right  { padding-right:  env(safe-area-inset-right); }
+
+/* Prevent text size inflation on orientation change */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* Larger tap targets on touch screens */
+@media (pointer: coarse) {
+  button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  input[type="range"] {
+    height: 28px;
+  }
+}
+
+/* Hide scrollbar but allow scroll */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* Smooth scrolling in panels */
+.overscroll-contain { overscroll-behavior: contain; }
+
+/* Prevent rubber-band scroll on body in PWA mode */
+@media (display-mode: standalone) {
+  body { overscroll-behavior-y: none; }
+}
+
+/* Disable callout / selection on UI elements */
+nav, header, .no-select {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Bottom nav active indicator positioning */
+nav button { position: relative; }
+
+/* Touch-friendly color swatches */
+@media (pointer: coarse) {
+  .color-swatch { width: 36px !important; height: 36px !important; }
+}

@@ -1,0 +1,12 @@
+{
+  "framework": "nextjs",
+  "functions": {
+    "app/api/generate-story/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_APP_URL": "@app_url"
+  }
+}

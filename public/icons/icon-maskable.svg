@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#FC4C02"/>
+  <!-- Phone frame, centered and smaller for maskable safe area -->
+  <rect x="176" y="116" width="160" height="280" rx="18" fill="#0A0A0B"/>
+  <rect x="192" y="260" width="128" height="5" rx="2.5" fill="rgba(255,255,255,0.15)"/>
+  <rect x="192" y="275" width="128" height="22" rx="3" fill="white"/>
+  <rect x="192" y="305" width="56" height="13" rx="2" fill="rgba(255,255,255,0.5)"/>
+  <rect x="256" y="305" width="56" height="13" rx="2" fill="rgba(255,255,255,0.5)"/>
+  <path d="M196 215 Q214 196 234 208 Q254 220 272 204 Q286 194 316 198"
+    fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+</svg>
