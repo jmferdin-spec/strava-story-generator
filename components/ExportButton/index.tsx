@@ -36,9 +36,10 @@ export default function ExportButton({ fullWidth = false }: { fullWidth?: boolea
         : 'strava-story';
       const fileName = `${activityName}-story.png`;
 
-      // On mobile, try the Web Share API first so user can share directly to Instagram etc.
+      // On mobile, use Web Share API for Instagram etc. On desktop, direct download.
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       const file = new File([blob], fileName, { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
           title: 'My Strava Story',
@@ -91,7 +92,7 @@ export default function ExportButton({ fullWidth = false }: { fullWidth?: boolea
     },
   };
 
-  const isMobileShare = typeof navigator !== 'undefined' && 'share' in navigator;
+  const isMobileShare = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   return (
     <div className={`relative ${fullWidth ? 'w-full' : ''}`}>
