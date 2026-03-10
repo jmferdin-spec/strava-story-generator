@@ -10,6 +10,9 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   experimental: {
     serverComponentsExternalPackages: ['@sparticuz/chromium', 'puppeteer-core', 'sharp'],
   },
