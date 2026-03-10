@@ -1,16 +1,16 @@
 'use client';
 
 import { useStoryStore } from '@/store/useStoryStore';
-import type { StatAlignment, StoryConfig } from '@/types';
+import type { StatAlignment, StoryConfig, UnitSystem } from '@/types';
 
 type StatKey = keyof StoryConfig['visibleStats'];
 
-const STATS: { key: StatKey; label: string; icon: string; description: string }[] = [
-  { key: 'distance', label: 'Distance', icon: '📏', description: 'Total km run' },
-  { key: 'time', label: 'Moving Time', icon: '⏱️', description: 'Active duration' },
-  { key: 'pace', label: 'Average Pace', icon: '⚡', description: 'Min per kilometer' },
-  { key: 'elevation', label: 'Elevation Gain', icon: '⛰️', description: 'Total meters climbed' },
-  { key: 'date', label: 'Date', icon: '📅', description: 'Activity date' },
+const STATS: { key: StatKey; label: string; icon: string; descriptions: Record<UnitSystem, string> }[] = [
+  { key: 'distance', label: 'Distance', icon: '📏', descriptions: { metric: 'Total km run', imperial: 'Total miles run' } },
+  { key: 'time', label: 'Moving Time', icon: '⏱️', descriptions: { metric: 'Active duration', imperial: 'Active duration' } },
+  { key: 'pace', label: 'Average Pace', icon: '⚡', descriptions: { metric: 'Min per kilometer', imperial: 'Min per mile' } },
+  { key: 'elevation', label: 'Elevation Gain', icon: '⛰️', descriptions: { metric: 'Total meters climbed', imperial: 'Total feet climbed' } },
+  { key: 'date', label: 'Date', icon: '📅', descriptions: { metric: 'Activity date', imperial: 'Activity date' } },
 ];
 
 const ALIGNMENTS: { value: StatAlignment; icon: React.ReactNode; label: string }[] = [
@@ -94,10 +94,41 @@ export default function StatControls() {
     toggleStat,
     setStatAlignment,
     setStatVerticalOffset,
+    setUnits,
   } = useStoryStore();
+
+  const units = config.units || 'metric';
 
   return (
     <div className="p-4 space-y-5">
+      {/* Unit system toggle */}
+      <div>
+        <p className="section-label">Unit System</p>
+        <div className="grid grid-cols-2 gap-2">
+          {([
+            { value: 'metric' as UnitSystem, label: 'Metric', sub: 'km, /km, m' },
+            { value: 'imperial' as UnitSystem, label: 'Imperial', sub: 'mi, /mi, ft' },
+          ]).map((option) => {
+            const isSelected = units === option.value;
+            return (
+              <button
+                key={option.value}
+                onClick={() => setUnits(option.value)}
+                className="flex flex-col items-center gap-1 py-3 rounded-xl transition-all"
+                style={{
+                  background: isSelected ? 'rgba(252,76,2,0.08)' : 'rgba(255,255,255,0.02)',
+                  border: `1px solid ${isSelected ? 'rgba(252,76,2,0.3)' : 'rgba(255,255,255,0.05)'}`,
+                  color: isSelected ? '#FC4C02' : '#6B6B78',
+                }}
+              >
+                <span className="text-xs font-medium">{option.label}</span>
+                <span className="text-[10px] opacity-60">{option.sub}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Visible stats */}
       <div>
         <p className="section-label">Visible Stats</p>
@@ -125,7 +156,7 @@ export default function StatControls() {
                     >
                       {stat.label}
                     </p>
-                    <p className="text-[10px] text-[#3A3A44]">{stat.description}</p>
+                    <p className="text-[10px] text-[#3A3A44]">{stat.descriptions[units]}</p>
                   </div>
                 </div>
 

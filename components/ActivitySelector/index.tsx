@@ -8,7 +8,7 @@ import {
   formatElevation,
   formatDateShort,
 } from '@/lib/strava';
-import type { StravaActivity } from '@/types';
+import type { StravaActivity, UnitSystem } from '@/types';
 
 function ActivityCard({
   activity,
@@ -19,9 +19,13 @@ function ActivityCard({
   isSelected: boolean;
   onSelect: () => void;
 }) {
-  const distanceKm = (activity.distance / 1000).toFixed(2);
-  const pace = formatPaceValue(activity.average_speed);
-  const elevation = formatElevation(activity.total_elevation_gain);
+  const units = useStoryStore((s) => s.config.units) || 'metric';
+  const distanceVal = units === 'imperial'
+    ? (activity.distance / 1609.344).toFixed(2)
+    : (activity.distance / 1000).toFixed(2);
+  const distanceUnit = units === 'imperial' ? 'mi' : 'km';
+  const pace = formatPaceValue(activity.average_speed, units);
+  const elevation = formatElevation(activity.total_elevation_gain, units);
   const date = formatDateShort(activity.start_date_local);
   const time = formatTime(activity.moving_time);
 
@@ -64,9 +68,9 @@ function ActivityCard({
             className="text-lg font-bold leading-none"
             style={{ color: isSelected ? '#FC4C02' : '#E8E8EA' }}
           >
-            {distanceKm}
+            {distanceVal}
           </span>
-          <span className="text-[10px] text-[#6B6B78] ml-1">km</span>
+          <span className="text-[10px] text-[#6B6B78] ml-1">{distanceUnit}</span>
         </div>
 
         <div className="w-px h-6 bg-[rgba(255,255,255,0.06)]" />
@@ -186,7 +190,7 @@ export default function ActivitySelector() {
             {selectedActivity.name}
           </p>
           <p className="text-[11px] text-[#6B6B78] mt-0.5">
-            {formatDistance(selectedActivity.distance)} •{' '}
+            {formatDistance(selectedActivity.distance, useStoryStore.getState().config.units || 'metric')} •{' '}
             {formatTime(selectedActivity.moving_time)}
           </p>
         </div>

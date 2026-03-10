@@ -286,17 +286,18 @@ export default function StoryPreview() {
 
   // Stats
   const stats = useMemo(() => {
+    const units = config.units || 'metric';
     if (!selectedActivity) return {
-      distance: '10.52', time: '52:43', pace: '5:01', elevation: '124m', date: 'Mar 9, 2024',
+      distance: units === 'imperial' ? '6.54' : '10.52', time: '52:43', pace: units === 'imperial' ? '8:04' : '5:01', elevation: units === 'imperial' ? '407ft' : '124m', date: 'Mar 9, 2024',
     };
     return {
-      distance: formatDistanceValue(selectedActivity.distance),
+      distance: formatDistanceValue(selectedActivity.distance, units),
       time: formatTime(selectedActivity.moving_time),
-      pace: formatPaceValue(selectedActivity.average_speed),
-      elevation: formatElevation(selectedActivity.total_elevation_gain),
+      pace: formatPaceValue(selectedActivity.average_speed, units),
+      elevation: formatElevation(selectedActivity.total_elevation_gain, units),
       date: formatDateShort(selectedActivity.start_date_local),
     };
-  }, [selectedActivity]);
+  }, [selectedActivity, config.units]);
 
   // Route SVG (debounced 80ms — fast enough to feel live)
   const routeOptions = useMemo(() => ({
