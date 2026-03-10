@@ -354,20 +354,16 @@ export default function DashboardPage() {
 // ─── Mobile activity selector wrapper ────────────────────────────────────────
 // Wraps ActivitySelector and fires callback when an activity is tapped
 function MobileActivitySelector({ onSelect }: { onSelect: () => void }) {
-  const { selectActivity } = useStoryStore();
-
-  // Override selectActivity to also navigate
-  const wrappedSelect = useCallback((activity: Parameters<typeof selectActivity>[0]) => {
-    selectActivity(activity);
-    onSelect();
-  }, [selectActivity, onSelect]);
-
-  // Temporarily patch the store
   useEffect(() => {
     const originalFn = useStoryStore.getState().selectActivity;
-    useStoryStore.setState({ selectActivity: wrappedSelect });
+    useStoryStore.setState({
+      selectActivity: (activity: Parameters<typeof originalFn>[0]) => {
+        originalFn(activity);
+        onSelect();
+      },
+    });
     return () => useStoryStore.setState({ selectActivity: originalFn });
-  }, [wrappedSelect]);
+  }, [onSelect]);
 
   return <ActivitySelector />;
 }
