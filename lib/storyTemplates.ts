@@ -34,6 +34,7 @@ export const DEFAULT_CONFIG: Omit<StoryConfig, 'activity'> = {
   routePosition: 'middle',
   routeGlowIntensity: 1.5,
   statVerticalOffset: 75,
+  units: 'metric',
 };
 
 // ─── Template Definitions ──────────────────────────────────────────────────────
@@ -460,19 +461,28 @@ function getStatBlockHtml(
   }
 }
 
+function getUnitLabels(config: StoryConfig) {
+  const isImperial = config.units === 'imperial';
+  return {
+    distance: isImperial ? 'mi' : 'km',
+    pace: isImperial ? '/mi' : '/km',
+  };
+}
+
 function getMinimalStatBlock(
   stats: StoryRenderData['stats'],
   visibleStats: StoryRenderData['visibleStats'],
   config: StoryConfig
 ): string {
+  const u = getUnitLabels(config);
   const row2: string[] = [];
   if (visibleStats.time) row2.push(`<div class="stat-item"><div class="stat-label">Time</div><div class="stat-value" style="font-size:${Math.round(config.fontSize * 0.72)}px">${stats.time}</div></div>`);
-  if (visibleStats.pace) row2.push(`<div class="stat-item"><div class="stat-label">Pace</div><div class="stat-value" style="font-size:${Math.round(config.fontSize * 0.72)}px">${stats.pace}<span class="stat-unit">/km</span></div></div>`);
+  if (visibleStats.pace) row2.push(`<div class="stat-item"><div class="stat-label">Pace</div><div class="stat-value" style="font-size:${Math.round(config.fontSize * 0.72)}px">${stats.pace}<span class="stat-unit">${u.pace}</span></div></div>`);
   if (visibleStats.elevation) row2.push(`<div class="stat-item"><div class="stat-label">Elevation</div><div class="stat-value" style="font-size:${Math.round(config.fontSize * 0.72)}px">${stats.elevation}</div></div>`);
 
   return `<div class="stat-block">
     <div class="stat-divider"></div>
-    ${visibleStats.distance ? `<div class="stat-item"><div class="stat-label">Distance</div><div class="stat-value">${stats.distance}<span class="stat-unit">km</span></div></div>` : ''}
+    ${visibleStats.distance ? `<div class="stat-item"><div class="stat-label">Distance</div><div class="stat-value">${stats.distance}<span class="stat-unit">${u.distance}</span></div></div>` : ''}
     ${row2.length > 0 ? `<div class="stats-grid">${row2.join('')}</div>` : ''}
     ${visibleStats.date ? `<div class="stat-date">${stats.date}</div>` : ''}
   </div>`;
@@ -483,8 +493,9 @@ function getLargeCenterStatBlock(
   visibleStats: StoryRenderData['visibleStats'],
   config: StoryConfig
 ): string {
+  const u = getUnitLabels(config);
   return `<div class="stat-block">
-    ${visibleStats.distance ? `<div class="stat-item"><div class="stat-label">Distance</div><div class="stat-value" style="font-size:${config.fontSize * 1.45}px">${stats.distance}<span class="stat-unit" style="font-size:${config.fontSize * 0.45}px">km</span></div></div>` : ''}
+    ${visibleStats.distance ? `<div class="stat-item"><div class="stat-label">Distance</div><div class="stat-value" style="font-size:${config.fontSize * 1.45}px">${stats.distance}<span class="stat-unit" style="font-size:${config.fontSize * 0.45}px">${u.distance}</span></div></div>` : ''}
     <div class="stat-divider"></div>
     <div class="stats-grid" style="justify-content:center;text-align:center;">
       ${visibleStats.time ? `<div class="stat-item"><div class="stat-label">Time</div><div class="stat-value" style="font-size:${config.fontSize * 0.8}px">${stats.time}</div></div>` : ''}
@@ -500,8 +511,9 @@ function getGradientBarStatBlock(
   visibleStats: StoryRenderData['visibleStats'],
   config: StoryConfig
 ): string {
+  const u = getUnitLabels(config);
   const items = [
-    visibleStats.distance && `<div class="stat-item" style="text-align:center"><div class="stat-label">Distance</div><div class="stat-value">${stats.distance}<span style="font-size:0.38em;margin-left:4px">km</span></div></div>`,
+    visibleStats.distance && `<div class="stat-item" style="text-align:center"><div class="stat-label">Distance</div><div class="stat-value">${stats.distance}<span style="font-size:0.38em;margin-left:4px">${u.distance}</span></div></div>`,
     visibleStats.time && `<div class="stat-item" style="text-align:center"><div class="stat-label">Time</div><div class="stat-value" style="font-size:${config.fontSize * 0.72}px">${stats.time}</div></div>`,
     visibleStats.pace && `<div class="stat-item" style="text-align:center"><div class="stat-label">Pace</div><div class="stat-value" style="font-size:${config.fontSize * 0.72}px">${stats.pace}</div></div>`,
     visibleStats.elevation && `<div class="stat-item" style="text-align:center"><div class="stat-label">Elevation</div><div class="stat-value" style="font-size:${config.fontSize * 0.72}px">${stats.elevation}</div></div>`,
@@ -520,9 +532,10 @@ function getAthletePosterStatBlock(
   visibleStats: StoryRenderData['visibleStats'],
   config: StoryConfig
 ): string {
+  const u = getUnitLabels(config);
   return `<div class="stat-block">
     <div class="accent-line"></div>
-    ${visibleStats.distance ? `<div class="stat-item" style="margin-bottom:14px"><div class="stat-label" style="font-size:${config.fontSize * 0.22}px">Total Distance</div><div class="stat-value" style="font-size:${config.fontSize * 1.6}px;line-height:0.88">${stats.distance}<span style="font-size:0.28em;vertical-align:middle;margin-left:10px">km</span></div></div>` : ''}
+    ${visibleStats.distance ? `<div class="stat-item" style="margin-bottom:14px"><div class="stat-label" style="font-size:${config.fontSize * 0.22}px">Total Distance</div><div class="stat-value" style="font-size:${config.fontSize * 1.6}px;line-height:0.88">${stats.distance}<span style="font-size:0.28em;vertical-align:middle;margin-left:10px">${u.distance}</span></div></div>` : ''}
     <div style="display:flex;gap:56px;margin-top:28px;flex-wrap:wrap">
       ${visibleStats.time ? `<div><div class="stat-label">Moving Time</div><div class="stat-value" style="font-size:${config.fontSize * 0.65}px">${stats.time}</div></div>` : ''}
       ${visibleStats.pace ? `<div><div class="stat-label">Avg Pace</div><div class="stat-value" style="font-size:${config.fontSize * 0.65}px">${stats.pace}</div></div>` : ''}

@@ -1,4 +1,4 @@
-import type { StravaAthlete, StravaActivity } from '@/types';
+import type { StravaAthlete, StravaActivity, UnitSystem } from '@/types';
 
 const STRAVA_API_BASE = 'https://www.strava.com/api/v3';
 const STRAVA_AUTH_URL = 'https://www.strava.com/oauth/authorize';
@@ -129,18 +129,33 @@ export async function getActivityById(
   return stravaFetch<StravaActivity>(`/activities/${activityId}`, accessToken);
 }
 
+// ─── Unit Conversion Constants ────────────────────────────────────────────────
+
+const METERS_PER_MILE = 1609.344;
+const METERS_PER_FOOT = 0.3048;
+
 // ─── Formatting Utilities ──────────────────────────────────────────────────────
 
-export function formatDistance(meters: number): string {
-  const km = meters / 1000;
-  if (km < 10) {
-    return `${km.toFixed(2)} km`;
+export function formatDistance(meters: number, units: UnitSystem = 'metric'): string {
+  if (units === 'imperial') {
+    const miles = meters / METERS_PER_MILE;
+    if (miles < 10) return `${miles.toFixed(2)} mi`;
+    return `${miles.toFixed(1)} mi`;
   }
+  const km = meters / 1000;
+  if (km < 10) return `${km.toFixed(2)} km`;
   return `${km.toFixed(1)} km`;
 }
 
-export function formatDistanceValue(meters: number): string {
+export function formatDistanceValue(meters: number, units: UnitSystem = 'metric'): string {
+  if (units === 'imperial') {
+    return (meters / METERS_PER_MILE).toFixed(2);
+  }
   return (meters / 1000).toFixed(2);
+}
+
+export function formatDistanceUnit(units: UnitSystem = 'metric'): string {
+  return units === 'imperial' ? 'mi' : 'km';
 }
 
 export function formatTime(seconds: number): string {
@@ -154,24 +169,47 @@ export function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export function formatPace(metersPerSecond: number): string {
+export function formatPace(metersPerSecond: number, units: UnitSystem = 'metric'): string {
   if (metersPerSecond === 0) return '–';
+  if (units === 'imperial') {
+    const secondsPerMile = METERS_PER_MILE / metersPerSecond;
+    const minutes = Math.floor(secondsPerMile / 60);
+    const seconds = Math.round(secondsPerMile % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')} /mi`;
+  }
   const secondsPerKm = 1000 / metersPerSecond;
   const minutes = Math.floor(secondsPerKm / 60);
   const seconds = Math.round(secondsPerKm % 60);
   return `${minutes}:${seconds.toString().padStart(2, '0')} /km`;
 }
 
-export function formatPaceValue(metersPerSecond: number): string {
+export function formatPaceValue(metersPerSecond: number, units: UnitSystem = 'metric'): string {
   if (metersPerSecond === 0) return '–';
+  if (units === 'imperial') {
+    const secondsPerMile = METERS_PER_MILE / metersPerSecond;
+    const minutes = Math.floor(secondsPerMile / 60);
+    const seconds = Math.round(secondsPerMile % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
   const secondsPerKm = 1000 / metersPerSecond;
   const minutes = Math.floor(secondsPerKm / 60);
   const seconds = Math.round(secondsPerKm % 60);
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-export function formatElevation(meters: number): string {
+export function formatPaceUnit(units: UnitSystem = 'metric'): string {
+  return units === 'imperial' ? '/mi' : '/km';
+}
+
+export function formatElevation(meters: number, units: UnitSystem = 'metric'): string {
+  if (units === 'imperial') {
+    return `${Math.round(meters / METERS_PER_FOOT)}ft`;
+  }
   return `${Math.round(meters)}m`;
+}
+
+export function formatElevationUnit(units: UnitSystem = 'metric'): string {
+  return units === 'imperial' ? 'ft' : 'm';
 }
 
 export function formatDate(dateString: string): string {
