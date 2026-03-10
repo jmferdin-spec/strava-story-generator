@@ -87,15 +87,16 @@ async function renderLocally(
   backgroundImageBase64?: string
 ): Promise<NextResponse> {
   const activity = config.activity;
+  const units = config.units || 'metric';
   const stats = activity
     ? {
-        distance:  formatDistanceValue(activity.distance),
+        distance:  formatDistanceValue(activity.distance, units),
         time:      formatTime(activity.moving_time),
-        pace:      formatPaceValue(activity.average_speed),
-        elevation: formatElevation(activity.total_elevation_gain),
+        pace:      formatPaceValue(activity.average_speed, units),
+        elevation: formatElevation(activity.total_elevation_gain, units),
         date:      formatDateShort(activity.start_date_local),
       }
-    : { distance: '10.00', time: '52:30', pace: '5:15', elevation: '120m', date: 'Jan 1, 2024' };
+    : { distance: '10.00', time: '52:30', pace: '5:15', elevation: units === 'imperial' ? '394ft' : '120m', date: 'Jan 1, 2024' };
 
   let routeSvg: string | undefined;
   if (config.showRoute && activity?.map?.summary_polyline) {
@@ -163,7 +164,7 @@ async function renderLocally(
     });
     await browser.close();
 
-    return new NextResponse(new Uint8Array(screenshot), {
+    return new NextResponse(screenshot as Buffer, {
       status: 200,
       headers: {
         'Content-Type':        'image/png',
@@ -188,15 +189,16 @@ export async function GET(request: NextRequest) {
   try {
     const config: StoryConfig = JSON.parse(decodeURIComponent(configParam));
     const activity = config.activity;
+    const units = config.units || 'metric';
     const stats = activity
       ? {
-          distance:  formatDistanceValue(activity.distance),
+          distance:  formatDistanceValue(activity.distance, units),
           time:      formatTime(activity.moving_time),
-          pace:      formatPaceValue(activity.average_speed),
-          elevation: formatElevation(activity.total_elevation_gain),
+          pace:      formatPaceValue(activity.average_speed, units),
+          elevation: formatElevation(activity.total_elevation_gain, units),
           date:      formatDateShort(activity.start_date_local),
         }
-      : { distance: '10.00', time: '52:30', pace: '5:15', elevation: '120m', date: 'Jan 1, 2024' };
+      : { distance: '10.00', time: '52:30', pace: '5:15', elevation: units === 'imperial' ? '394ft' : '120m', date: 'Jan 1, 2024' };
 
     let routeSvg: string | undefined;
     if (config.showRoute && activity?.map?.summary_polyline) {
