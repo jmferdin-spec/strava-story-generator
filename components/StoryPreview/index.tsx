@@ -88,48 +88,58 @@ function DragHandle({ position, scale, onDragEnd, snapping, onSnappingChange }: 
   const x = (isDragging ? dragPos.x : position.x) * scale;
   const y = (isDragging ? dragPos.y : position.y) * scale;
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
+  // Shared drag start logic
+  const startDrag = useCallback((clientX: number, clientY: number) => {
     setIsDragging(true);
     onSnappingChange(true);
     startRef.current = {
-      mouseX: e.clientX,
-      mouseY: e.clientY,
+      mouseX: clientX,
+      mouseY: clientY,
       posX: position.x,
       posY: position.y,
     };
     setDragPos({ x: position.x, y: position.y });
   }, [position, onSnappingChange]);
 
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    startDrag(e.clientX, e.clientY);
+  }, [startDrag]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    e.stopPropagation();
+    const touch = e.touches[0];
+    startDrag(touch.clientX, touch.clientY);
+  }, [startDrag]);
+
   useEffect(() => {
     if (!isDragging) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const dx = (e.clientX - startRef.current.mouseX) / scale;
-      const dy = (e.clientY - startRef.current.mouseY) / scale;
+    // Shared move logic
+    const moveHandler = (clientX: number, clientY: number) => {
+      const dx = (clientX - startRef.current.mouseX) / scale;
+      const dy = (clientY - startRef.current.mouseY) / scale;
 
       let rawX = startRef.current.posX + dx;
       let rawY = startRef.current.posY + dy;
 
-      // Clamp to story bounds
       rawX = Math.max(80, Math.min(STORY_WIDTH - 80, rawX));
       rawY = Math.max(250, Math.min(STORY_HEIGHT - 300, rawY));
 
-      // Snap to grid
       const snappedX = snapToGrid(rawX, GRID_SIZE);
       const snappedY = snapToGrid(rawY, GRID_SIZE);
 
       setDragPos({ x: snappedX, y: snappedY });
     };
 
-    const handleMouseUp = (e: MouseEvent) => {
+    // Shared end logic
+    const endHandler = (clientX: number, clientY: number) => {
       setIsDragging(false);
       onSnappingChange(false);
 
-      const dx = (e.clientX - startRef.current.mouseX) / scale;
-      const dy = (e.clientY - startRef.current.mouseY) / scale;
+      const dx = (clientX - startRef.current.mouseX) / scale;
+      const dy = (clientY - startRef.current.mouseY) / scale;
 
       let rawX = Math.max(80, Math.min(STORY_WIDTH - 80, startRef.current.posX + dx));
       let rawY = Math.max(250, Math.min(STORY_HEIGHT - 300, startRef.current.posY + dy));
@@ -140,11 +150,30 @@ function DragHandle({ position, scale, onDragEnd, snapping, onSnappingChange }: 
       onDragEnd({ x: finalX, y: finalY });
     };
 
+    // Mouse handlers
+    const handleMouseMove = (e: MouseEvent) => moveHandler(e.clientX, e.clientY);
+    const handleMouseUp = (e: MouseEvent) => endHandler(e.clientX, e.clientY);
+
+    // Touch handlers
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      moveHandler(touch.clientX, touch.clientY);
+    };
+    const handleTouchEnd = (e: TouchEvent) => {
+      const touch = e.changedTouches[0];
+      endHandler(touch.clientX, touch.clientY);
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [isDragging, scale, onDragEnd, onSnappingChange]);
 
@@ -177,13 +206,14 @@ function DragHandle({ position, scale, onDragEnd, snapping, onSnappingChange }: 
         </>
       )}
 
-      {/* Handle ring */}
+      {/* Handle ring — larger touch target on mobile */}
       <div
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         className="relative flex items-center justify-center transition-all duration-100"
         style={{
-          width: isDragging ? 44 : 36,
-          height: isDragging ? 44 : 36,
+          width: isDragging ? 52 : 44,
+          height: isDragging ? 52 : 44,
           borderRadius: '50%',
           background: isDragging
             ? 'rgba(252,76,2,0.25)'
@@ -193,6 +223,7 @@ function DragHandle({ position, scale, onDragEnd, snapping, onSnappingChange }: 
           boxShadow: isDragging
             ? '0 0 0 4px rgba(252,76,2,0.15), 0 0 20px rgba(252,76,2,0.3)'
             : '0 0 0 2px rgba(252,76,2,0.1)',
+          touchAction: 'none',
         }}
       >
         {/* Crosshair icon */}
@@ -219,7 +250,6 @@ function DragHandle({ position, scale, onDragEnd, snapping, onSnappingChange }: 
     </div>
   );
 }
-
 // ─── Safe zone overlay ─────────────────────────────────────────────────────────
 function SafeZoneIndicators({ scale }: { scale: number }) {
   return (
