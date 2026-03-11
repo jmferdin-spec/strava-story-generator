@@ -248,7 +248,7 @@ export default function StoryGallery() {
   const store = useStoryStore();
   const [exportingIdx, setExportingIdx] = useState<number | null>(null);
 
-  const units = (config.units || 'metric') as UnitSystem;
+  const units = (config.units || 'imperial') as UnitSystem;
 
   // Stats for the selected activity
   const stats = useMemo(() => {
@@ -301,6 +301,56 @@ export default function StoryGallery() {
     });
   }, [config, selectedActivity, stats, units]);
 
+  // Browser-based render to PNG
+  const renderToPng = useCallback(async (html: string): Promise<Blob> => {
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.left = '0';
+    container.style.top = '0';
+    container.style.width = `${STORY_WIDTH}px`;
+    container.style.height = `${STORY_HEIGHT}px`;
+    container.style.overflow = 'hidden';
+    container.style.opacity = '0';
+    container.style.pointerEvents = 'none';
+    container.style.zIndex = '-9999';
+    document.body.appendChild(container);
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    const styles = doc.querySelectorAll('style');
+    styles.forEach((style) => {
+      const cloned = document.createElement('style');
+      cloned.textContent = style.textContent;
+      container.appendChild(cloned);
+    });
+
+    container.innerHTML += doc.body.innerHTML;
+
+    const storyEl = container.querySelector('.story') as HTMLElement;
+    if (!storyEl) throw new Error('Story element not found');
+
+    await document.fonts.ready;
+    await new Promise((r) => setTimeout(r, 500));
+
+    try {
+      const htmlToImage = await import('html-to-image');
+      const fontEmbedCSS = await htmlToImage.getFontEmbedCSS(storyEl);
+      const dataUrl = await htmlToImage.toPng(storyEl, {
+        width: STORY_WIDTH,
+        height: STORY_HEIGHT,
+        pixelRatio: 1,
+        cacheBust: true,
+        fontEmbedCSS,
+      });
+
+      const res = await fetch(dataUrl);
+      return await res.blob();
+    } finally {
+      document.body.removeChild(container);
+    }
+  }, []);
+
   // Download a specific preset
   const handleDownload = useCallback(async (idx: number) => {
     if (exportingIdx !== null) return;
@@ -315,24 +365,43 @@ export default function StoryGallery() {
         activity: selectedActivity || config.activity,
       };
 
-      const response = await fetch('/api/generate-story', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          config: presetConfig,
-          backgroundImageBase64: config.backgroundImage,
-        }),
+      const pStats = selectedActivity ? {
+        distance: formatDistanceValue(selectedActivity.distance, units),
+        time: formatTime(selectedActivity.moving_time),
+        pace: formatPaceValue(selectedActivity.average_speed, units),
+        elevation: formatElevation(selectedActivity.total_elevation_gain, units),
+        date: formatDateShort(selectedActivity.start_date_local),
+      } : stats;
+
+      let routeSvg: string | undefined;
+      if (presetConfig.showRoute && selectedActivity?.map?.summary_polyline) {
+        routeSvg = generateRouteSvg(selectedActivity.map.summary_polyline, {
+          width: STORY_WIDTH,
+          height: STORY_HEIGHT * 0.4,
+          color: presetConfig.routeColor,
+          thickness: presetConfig.routeThickness,
+          opacity: presetConfig.routeOpacity,
+          padding: 80,
+          glowIntensity: presetConfig.routeGlowIntensity ?? 1,
+        });
+      }
+
+      const html = generateStoryHtml({
+        backgroundImage: config.backgroundImage,
+        routeSvg,
+        stats: pStats,
+        visibleStats: presetConfig.visibleStats,
+        config: presetConfig,
       });
 
-      if (!response.ok) throw new Error('Export failed');
-
-      const blob = await response.blob();
+      const blob = await renderToPng(html);
       const url = URL.createObjectURL(blob);
 
       const activityName = selectedActivity?.name
         ? selectedActivity.name.replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 30)
         : 'strava-story';
-      const fileName = `${activityName}-${preset.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const fileName = `${activityName}-${preset.name.replace(/\s+/g, '-').toLowerCase()}-${timestamp}.png`;
 
       // Download
       const a = document.createElement('a');
@@ -342,22 +411,13 @@ export default function StoryGallery() {
       a.click();
       document.body.removeChild(a);
 
-      // Mobile share
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const file = new File([blob], fileName, { type: 'image/png' });
-      if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title: 'My Strava Story' });
-        } catch { /* cancelled */ }
-      }
-
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Gallery export failed:', err);
     } finally {
       setExportingIdx(null);
     }
-  }, [config, selectedActivity, units, exportingIdx]);
+  }, [config, selectedActivity, units, exportingIdx, stats, renderToPng]);
 
   // Apply preset to main editor
   const handleApply = useCallback((idx: number) => {
