@@ -15,8 +15,6 @@ const STORY_HEIGHT = 1920;
 
 // Render story HTML to PNG blob in the browser
 async function renderStoryToPng(html: string): Promise<Blob> {
-  
-  // Create hidden container
   const container = document.createElement('div');
   container.style.position = 'fixed';
   container.style.left = '0';
@@ -29,11 +27,10 @@ async function renderStoryToPng(html: string): Promise<Blob> {
   container.style.zIndex = '-9999';
   document.body.appendChild(container);
 
-  // Parse the HTML and extract body content + styles
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
 
-  // Copy all style tags from the generated HTML
+  // Copy all styles from generated HTML
   const styles = doc.querySelectorAll('style');
   styles.forEach((style) => {
     const cloned = document.createElement('style');
@@ -41,55 +38,29 @@ async function renderStoryToPng(html: string): Promise<Blob> {
     container.appendChild(cloned);
   });
 
-  // Add a reset style for the container itself
-  const resetStyle = document.createElement('style');
-  resetStyle.textContent = `
-    .story-render-root {
-      width: ${STORY_WIDTH}px;
-      height: ${STORY_HEIGHT}px;
-      overflow: hidden;
-      position: relative;
-      font-family: 'Helvetica Neue', sans-serif;
-    }
-    .story-render-root * { margin: 0; padding: 0; box-sizing: border-box; }
-  `;
-  container.appendChild(resetStyle);
+  // Copy body content directly (the .story div and everything inside)
+  container.innerHTML += doc.body.innerHTML;
 
-  // Create wrapper and inject body content
-  const wrapper = document.createElement('div');
-  wrapper.className = 'story-render-root';
-  wrapper.style.width = `${STORY_WIDTH}px`;
-  wrapper.style.height = `${STORY_HEIGHT}px`;
-  wrapper.style.position = 'relative';
-  wrapper.style.overflow = 'hidden';
-  wrapper.innerHTML = doc.body.innerHTML;
-  container.appendChild(wrapper);
+  // Find the .story element — this is what we render
+  const storyEl = container.querySelector('.story') as HTMLElement;
+  if (!storyEl) throw new Error('Story element not found');
 
-  // Wait for fonts to load
   await document.fonts.ready;
-  // Extra delay for rendering
   await new Promise((r) => setTimeout(r, 500));
 
   try {
-    // Use html-to-image
     const htmlToImage = await import('html-to-image');
-    const fontEmbedCSS = await htmlToImage.getFontEmbedCSS(wrapper);
-    const dataUrl = await htmlToImage.toPng(wrapper, {
+    const fontEmbedCSS = await htmlToImage.getFontEmbedCSS(storyEl);
+    const dataUrl = await htmlToImage.toPng(storyEl, {
       width: STORY_WIDTH,
       height: STORY_HEIGHT,
       pixelRatio: 1,
       cacheBust: true,
       fontEmbedCSS,
-      style: {
-        transform: 'none',
-      },
     });
 
-    // Convert data URL to blob
     const res = await fetch(dataUrl);
-    const blob = await res.blob();
-
-    return blob;
+    return await res.blob();
   } finally {
     document.body.removeChild(container);
   }
