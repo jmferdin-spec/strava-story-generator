@@ -123,6 +123,7 @@ export interface StoryConfig {
   routeOffsetY: number;
   routeScale: number;
   statVerticalOffset: number;
+  statHorizontalOffset: number;
   units: UnitSystem;
 }
 

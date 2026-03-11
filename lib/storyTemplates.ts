@@ -37,6 +37,7 @@ export const DEFAULT_CONFIG: Omit<StoryConfig, 'activity'> = {
   routeOffsetY: 0,
   routeScale: 100,
   statVerticalOffset: 75,
+  statHorizontalOffset: 0,
   units: 'imperial',
 };
 
@@ -353,15 +354,19 @@ function getOverlayStyle(config: StoryConfig): string {
 function getTemplateStyles(config: StoryConfig, absPos: string): string {
   const ls = config.letterSpacing !== 0 ? `letter-spacing: ${config.letterSpacing}em;` : '';
 
+  const hOffset = config.statHorizontalOffset || 0;
+  const negHOffset = -1 * hOffset;
+
   const base = `
     .stat-block {
       position: absolute;
       padding: 60px;
       text-align: ${config.statAlignment};
       ${absPos || `
-        ${config.statAlignment === 'center' ? 'left: 0; right: 0; text-align: center;' : ''}
-        ${config.statAlignment === 'left' ? 'left: 0; padding-left: 80px;' : ''}
-        ${config.statAlignment === 'right' ? 'right: 0; padding-right: 80px;' : ''}
+        left: ${hOffset}%;
+        ${config.statAlignment === 'center' ? `right: ${negHOffset}%; text-align: center;` : ''}
+        ${config.statAlignment === 'left' ? 'padding-left: 80px;' : ''}
+        ${config.statAlignment === 'right' ? `right: ${negHOffset}%; left: auto; padding-right: 80px;` : ''}
         top: ${config.statVerticalOffset}%;
         transform: translateY(-${config.statVerticalOffset}%);
       `}
