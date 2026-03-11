@@ -19,12 +19,14 @@ async function renderStoryToPng(html: string): Promise<Blob> {
   // Create hidden container
   const container = document.createElement('div');
   container.style.position = 'fixed';
-  container.style.left = '-99999px';
+  container.style.left = '0';
   container.style.top = '0';
   container.style.width = `${STORY_WIDTH}px`;
   container.style.height = `${STORY_HEIGHT}px`;
   container.style.overflow = 'hidden';
-  container.style.zIndex = '-1';
+  container.style.opacity = '0';
+  container.style.pointerEvents = 'none';
+  container.style.zIndex = '-9999';
   document.body.appendChild(container);
 
   // Parse the HTML and extract body content + styles
