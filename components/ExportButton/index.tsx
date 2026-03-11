@@ -47,7 +47,11 @@ async function embedGoogleFont(fontFamily: string): Promise<string> {
 
     // Find all url() references and replace with base64 data
     const urlRegex = /url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/g;
-    const matches = [...css.matchAll(urlRegex)];
+    const matches: RegExpExecArray[] = [];
+    let m: RegExpExecArray | null;
+    while ((m = urlRegex.exec(css)) !== null) {
+      matches.push(m);
+    }
 
     for (const match of matches) {
       try {
