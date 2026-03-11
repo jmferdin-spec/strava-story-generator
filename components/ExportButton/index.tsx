@@ -1,42 +1,229 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useStoryStore } from '@/store/useStoryStore';
+import { generateStoryHtml } from '@/lib/storyTemplates';
+import { generateRouteSvg } from '@/lib/routeRenderer';
+import {
+  formatDistanceValue, formatTime, formatPaceValue,
+  formatElevation, formatDateShort,
+} from '@/lib/strava';
+import type { UnitSystem } from '@/types';
+
+const STORY_WIDTH = 1080;
+const STORY_HEIGHT = 1920;
+
+// Google Fonts CSS URLs for preloading
+const GOOGLE_FONTS_CSS: Record<string, string> = {
+  'Bebas Neue': 'https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap',
+  'Oswald': 'https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap',
+  'Montserrat': 'https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap',
+  'Raleway': 'https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800;900&display=swap',
+  'Space Mono': 'https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap',
+  'DM Serif Display': 'https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap',
+  'Inter': 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap',
+  'Barlow Condensed': 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&display=swap',
+  'Black Han Sans': 'https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap',
+  'Fjalla One': 'https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap',
+  'Staatliches': 'https://fonts.googleapis.com/css2?family=Staatliches&display=swap',
+  'Russo One': 'https://fonts.googleapis.com/css2?family=Russo+One&display=swap',
+  'Teko': 'https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&display=swap',
+  'Anton': 'https://fonts.googleapis.com/css2?family=Anton&display=swap',
+};
+
+// Fetch Google Font CSS and convert to embedded @font-face with base64 data
+async function embedGoogleFont(fontFamily: string): Promise<string> {
+  const cssUrl = GOOGLE_FONTS_CSS[fontFamily];
+  if (!cssUrl) return '';
+
+  try {
+    // Fetch the CSS (need to set user-agent to get woff2 URLs)
+    const cssRes = await fetch(cssUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      },
+    });
+    let css = await cssRes.text();
+
+    // Find all url() references and replace with base64 data
+    const urlRegex = /url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/g;
+    const matches = [...css.matchAll(urlRegex)];
+
+    for (const match of matches) {
+      try {
+        const fontRes = await fetch(match[1]);
+        const fontBlob = await fontRes.blob();
+        const base64 = await blobToBase64(fontBlob);
+        css = css.replace(match[0], `url(${base64})`);
+      } catch {
+        // Skip this font file if it fails
+      }
+    }
+
+    return css;
+  } catch {
+    return '';
+  }
+}
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+// Render story HTML to PNG blob in the browser
+async function renderStoryToPng(html: string, fontFamily: string): Promise<Blob> {
+  // Embed the font
+  const embeddedFontCss = await embedGoogleFont(fontFamily);
+
+  // Create hidden container
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-99999px';
+  container.style.top = '0';
+  container.style.width = `${STORY_WIDTH}px`;
+  container.style.height = `${STORY_HEIGHT}px`;
+  container.style.overflow = 'hidden';
+  container.style.zIndex = '-1';
+  document.body.appendChild(container);
+
+  // Parse the HTML and extract body content + styles
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // Inject embedded font CSS
+  if (embeddedFontCss) {
+    const fontStyle = document.createElement('style');
+    fontStyle.textContent = embeddedFontCss;
+    container.appendChild(fontStyle);
+  }
+
+  // Copy all style tags from the generated HTML
+  const styles = doc.querySelectorAll('style');
+  styles.forEach((style) => {
+    const cloned = document.createElement('style');
+    cloned.textContent = style.textContent;
+    container.appendChild(cloned);
+  });
+
+  // Add a reset style for the container itself
+  const resetStyle = document.createElement('style');
+  resetStyle.textContent = `
+    .story-render-root {
+      width: ${STORY_WIDTH}px;
+      height: ${STORY_HEIGHT}px;
+      overflow: hidden;
+      position: relative;
+      font-family: '${fontFamily}', 'Helvetica Neue', sans-serif;
+    }
+    .story-render-root * { margin: 0; padding: 0; box-sizing: border-box; }
+  `;
+  container.appendChild(resetStyle);
+
+  // Create wrapper and inject body content
+  const wrapper = document.createElement('div');
+  wrapper.className = 'story-render-root';
+  wrapper.innerHTML = doc.body.innerHTML;
+  container.appendChild(wrapper);
+
+  // Wait for fonts to load
+  await document.fonts.ready;
+  // Extra delay for rendering
+  await new Promise((r) => setTimeout(r, 500));
+
+  try {
+    // Use html-to-image
+    const { toPng } = await import('html-to-image');
+    const dataUrl = await toPng(wrapper, {
+      width: STORY_WIDTH,
+      height: STORY_HEIGHT,
+      pixelRatio: 1,
+      cacheBust: true,
+      skipFonts: true, // We already embedded them
+      style: {
+        transform: 'none',
+      },
+    });
+
+    // Convert data URL to blob
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+
+    return blob;
+  } finally {
+    document.body.removeChild(container);
+  }
+}
 
 export default function ExportButton({ fullWidth = false }: { fullWidth?: boolean }) {
   const { config, selectedActivity } = useStoryStore();
   const [state, setState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleExport = async () => {
+  const handleExport = useCallback(async () => {
     if (state === 'loading') return;
     setState('loading');
     setErrorMsg(null);
 
     try {
-      const response = await fetch('/api/generate-story', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          config,
-          backgroundImageBase64: config.backgroundImage,
-        }),
-      });
+      const units = (config.units || 'metric') as UnitSystem;
+      const activity = config.activity || selectedActivity;
 
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || 'Export failed');
+      // Generate stats
+      const stats = activity
+        ? {
+            distance: formatDistanceValue(activity.distance, units),
+            time: formatTime(activity.moving_time),
+            pace: formatPaceValue(activity.average_speed, units),
+            elevation: formatElevation(activity.total_elevation_gain, units),
+            date: formatDateShort(activity.start_date_local),
+          }
+        : {
+            distance: units === 'imperial' ? '6.54' : '10.52',
+            time: '52:43',
+            pace: units === 'imperial' ? '8:04' : '5:01',
+            elevation: units === 'imperial' ? '407ft' : '124m',
+            date: 'Mar 9, 2024',
+          };
+
+      // Generate route SVG
+      let routeSvg: string | undefined;
+      if (config.showRoute && activity?.map?.summary_polyline) {
+        routeSvg = generateRouteSvg(activity.map.summary_polyline, {
+          width: STORY_WIDTH,
+          height: STORY_HEIGHT * 0.4,
+          color: config.routeColor,
+          thickness: config.routeThickness,
+          opacity: config.routeOpacity,
+          padding: 80,
+          glowIntensity: config.routeGlowIntensity ?? 1,
+        });
       }
 
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
+      // Generate HTML
+      const html = generateStoryHtml({
+        backgroundImage: config.backgroundImage,
+        routeSvg,
+        stats,
+        visibleStats: config.visibleStats,
+        config,
+      });
 
+      // Render to PNG in the browser
+      const blob = await renderStoryToPng(html, config.fontFamily);
+
+      // Create download
+      const url = URL.createObjectURL(blob);
       const activityName = selectedActivity?.name
         ? selectedActivity.name.replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 40)
         : 'strava-story';
       const fileName = `${activityName}-story.png`;
 
-      // Always save the file first
+      // Always download first
       const a = document.createElement('a');
       a.href = url;
       a.download = fileName;
@@ -44,7 +231,7 @@ export default function ExportButton({ fullWidth = false }: { fullWidth?: boolea
       a.click();
       document.body.removeChild(a);
 
-      // On mobile, also open share sheet for Instagram etc.
+      // On mobile, also offer share
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       const file = new File([blob], fileName, { type: 'image/png' });
       if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -55,7 +242,7 @@ export default function ExportButton({ fullWidth = false }: { fullWidth?: boolea
             text: 'Generated with StoryRun',
           });
         } catch {
-          // User cancelled share sheet — that's fine, file is already saved
+          // User cancelled share — file already saved
         }
       }
 
@@ -63,17 +250,17 @@ export default function ExportButton({ fullWidth = false }: { fullWidth?: boolea
       setState('success');
       setTimeout(() => setState('idle'), 3000);
     } catch (err) {
-      // User cancelling the share sheet isn't an error
       if (err instanceof Error && err.name === 'AbortError') {
         setState('idle');
         return;
       }
       const msg = err instanceof Error ? err.message : 'Export failed';
+      console.error('Browser export error:', err);
       setErrorMsg(msg);
       setState('error');
       setTimeout(() => setState('idle'), 5000);
     }
-  };
+  }, [state, config, selectedActivity]);
 
   const buttonStyles = {
     idle: {
@@ -158,11 +345,6 @@ export default function ExportButton({ fullWidth = false }: { fullWidth?: boolea
         >
           <p className="font-medium mb-1">Export failed</p>
           <p className="text-[#6B6B78]">{errorMsg}</p>
-          {errorMsg.toLowerCase().includes('puppeteer') && (
-            <p className="mt-2 text-[10px] text-[#3A3A44]">
-              Make sure Puppeteer is installed: npm install puppeteer
-            </p>
-          )}
         </div>
       )}
     </div>
