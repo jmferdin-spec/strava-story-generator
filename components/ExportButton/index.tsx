@@ -47,7 +47,7 @@ async function renderStoryToPng(html: string): Promise<Blob> {
       height: ${STORY_HEIGHT}px;
       overflow: hidden;
       position: relative;
-      font-family: '${fontFamily}', 'Helvetica Neue', sans-serif;
+      font-family: 'Helvetica Neue', sans-serif;
     }
     .story-render-root * { margin: 0; padding: 0; box-sizing: border-box; }
   `;
