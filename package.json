@@ -32,7 +32,8 @@
     "tailwind-merge": "^2.4.0",
     "lucide-react": "^0.400.0",
     "date-fns": "^3.6.0",
-    "sharp": "^0.33.4"
+    "sharp": "^0.33.4",
+    "html-to-image": "^1.11.11"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
