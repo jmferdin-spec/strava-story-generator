@@ -76,6 +76,9 @@ interface StoryState {
   setRouteOpacity: (opacity: number) => void;
   setRoutePosition: (position: RoutePosition) => void;
   setRouteGlowIntensity: (intensity: number) => void;
+  setRouteOffsetX: (offset: number) => void;
+  setRouteOffsetY: (offset: number) => void;
+  setRouteScale: (scale: number) => void;
 
   // Config — units
   setUnits: (units: UnitSystem) => void;
@@ -149,6 +152,9 @@ export const useStoryStore = create<StoryState>()(
     setRouteOpacity: (opacity) => set((s) => { s.config.routeOpacity = opacity; }),
     setRoutePosition: (position) => set((s) => { s.config.routePosition = position; }),
     setRouteGlowIntensity: (intensity) => set((s) => { s.config.routeGlowIntensity = intensity; }),
+    setRouteOffsetX: (offset) => set((s) => { s.config.routeOffsetX = offset; }),
+    setRouteOffsetY: (offset) => set((s) => { s.config.routeOffsetY = offset; }),
+    setRouteScale: (scale) => set((s) => { s.config.routeScale = scale; }),
 
     setUnits: (units) => set((s) => { s.config.units = units; }),
 
