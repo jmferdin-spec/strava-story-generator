@@ -9,6 +9,7 @@ import {
   formatElevation, formatDateShort,
 } from '@/lib/strava';
 import { GRID_SIZE, STORY_WIDTH, STORY_HEIGHT, type StatPosition } from '@/types';
+import RouteToolbar from '@/components/RouteToolbar';
 
 const ASPECT = STORY_HEIGHT / STORY_WIDTH;
 
@@ -415,6 +416,7 @@ export default function StoryPreview() {
           transition: 'box-shadow 0.3s ease',
         }}
       >
+      <RouteToolbar />
         {/* Grid overlay (only during drag) */}
         <GridOverlay scale={scale} visible={isGridVisible} />
 
