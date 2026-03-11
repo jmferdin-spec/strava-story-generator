@@ -116,7 +116,8 @@ function useStoryExport() {
     const activityName = selectedActivity?.name
       ? selectedActivity.name.replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 40)
       : 'strava-story';
-    const fileName = `${activityName}-story.png`;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const fileName = `${activityName}-${timestamp}.png`;
 
     return { blob, fileName };
   }, [config, selectedActivity]);
