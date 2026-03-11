@@ -125,7 +125,7 @@ function DragHandle({ position, scale, onDragEnd, snapping, onSnappingChange }: 
       let rawY = startRef.current.posY + dy;
 
       rawX = Math.max(80, Math.min(STORY_WIDTH - 80, rawX));
-      rawY = Math.max(250, Math.min(STORY_HEIGHT - 300, rawY));
+      rawY = Math.max(120, Math.min(STORY_HEIGHT - 150, rawY));
 
       const snappedX = snapToGrid(rawX, GRID_SIZE);
       const snappedY = snapToGrid(rawY, GRID_SIZE);
@@ -142,7 +142,7 @@ function DragHandle({ position, scale, onDragEnd, snapping, onSnappingChange }: 
       const dy = (clientY - startRef.current.mouseY) / scale;
 
       let rawX = Math.max(80, Math.min(STORY_WIDTH - 80, startRef.current.posX + dx));
-      let rawY = Math.max(250, Math.min(STORY_HEIGHT - 300, startRef.current.posY + dy));
+      let rawY = Math.max(120, Math.min(STORY_HEIGHT - 150, startRef.current.posY + dy));
 
       const finalX = snapToGrid(rawX, GRID_SIZE);
       const finalY = snapToGrid(rawY, GRID_SIZE);
@@ -256,7 +256,7 @@ function SafeZoneIndicators({ scale }: { scale: number }) {
     <>
       {/* Top safe line */}
       <div className="absolute left-0 right-0 pointer-events-none z-20 flex items-center"
-        style={{ top: 250 * scale }}>
+        style={{ top: 120 * scale }}>
         <div className="flex-1 h-px" style={{ background: 'rgba(252,76,2,0.3)' }} />
         <span className="px-2 py-0.5 text-[8px] rounded mx-1 whitespace-nowrap"
           style={{ color: 'rgba(252,76,2,0.7)', background: 'rgba(252,76,2,0.1)' }}>
@@ -267,7 +267,7 @@ function SafeZoneIndicators({ scale }: { scale: number }) {
 
       {/* Bottom safe line */}
       <div className="absolute left-0 right-0 pointer-events-none z-20 flex items-center"
-        style={{ bottom: 300 * scale }}>
+        style={{ bottom: 150 * scale }}>
         <div className="flex-1 h-px" style={{ background: 'rgba(252,76,2,0.3)' }} />
         <span className="px-2 py-0.5 text-[8px] rounded mx-1 whitespace-nowrap"
           style={{ color: 'rgba(252,76,2,0.7)', background: 'rgba(252,76,2,0.1)' }}>
