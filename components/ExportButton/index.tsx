@@ -56,6 +56,10 @@ async function renderStoryToPng(html: string): Promise<Blob> {
   // Create wrapper and inject body content
   const wrapper = document.createElement('div');
   wrapper.className = 'story-render-root';
+  wrapper.style.width = `${STORY_WIDTH}px`;
+  wrapper.style.height = `${STORY_HEIGHT}px`;
+  wrapper.style.position = 'relative';
+  wrapper.style.overflow = 'hidden';
   wrapper.innerHTML = doc.body.innerHTML;
   container.appendChild(wrapper);
 
