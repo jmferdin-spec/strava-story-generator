@@ -33,8 +33,11 @@ export const DEFAULT_CONFIG: Omit<StoryConfig, 'activity'> = {
   routeOpacity: 0.9,
   routePosition: 'middle',
   routeGlowIntensity: 1.5,
+  routeOffsetX: 0,
+  routeOffsetY: 0,
+  routeScale: 100,
   statVerticalOffset: 75,
-  units: 'metric',
+  units: 'imperial',
 };
 
 // ─── Template Definitions ──────────────────────────────────────────────────────
@@ -244,17 +247,20 @@ export function generateStoryHtml(data: StoryRenderData): string {
     .route-container {
       position: absolute; left: 0; right: 0;
       pointer-events: none;
+      height: 700px;
+      top: 50%;
+      transform: translateX(${config.routeOffsetX || 0}%) translateY(calc(-50% + ${config.routeOffsetY || 0}%)) scale(${(config.routeScale || 100) / 100});
     }
-    .route-top    { top: 250px; height: 600px; }
-    .route-middle { top: 50%; transform: translateY(-50%); height: 700px; }
-    .route-bottom { bottom: 350px; height: 600px; }
-    .route-background { top: 0; bottom: 0; height: 100%; opacity: 0.35; }
+    .route-top    { top: 20%; }
+    .route-middle { top: 50%; }
+    .route-bottom { top: 75%; }
+    .route-background { top: 50%; height: 100%; opacity: 0.35; }
 
     .route-container svg { width: 100%; height: 100%; }
 
     .safe-zone {
       position: absolute;
-      top: 250px; bottom: 300px;
+      top: 120px; bottom: 150px;
       left: 0; right: 0;
     }
 
