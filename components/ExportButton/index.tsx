@@ -13,77 +13,9 @@ import type { UnitSystem } from '@/types';
 const STORY_WIDTH = 1080;
 const STORY_HEIGHT = 1920;
 
-// Google Fonts CSS URLs for preloading
-const GOOGLE_FONTS_CSS: Record<string, string> = {
-  'Bebas Neue': 'https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap',
-  'Oswald': 'https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap',
-  'Montserrat': 'https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap',
-  'Raleway': 'https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800;900&display=swap',
-  'Space Mono': 'https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap',
-  'DM Serif Display': 'https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap',
-  'Inter': 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap',
-  'Barlow Condensed': 'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&display=swap',
-  'Black Han Sans': 'https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap',
-  'Fjalla One': 'https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap',
-  'Staatliches': 'https://fonts.googleapis.com/css2?family=Staatliches&display=swap',
-  'Russo One': 'https://fonts.googleapis.com/css2?family=Russo+One&display=swap',
-  'Teko': 'https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&display=swap',
-  'Anton': 'https://fonts.googleapis.com/css2?family=Anton&display=swap',
-};
-
-// Fetch Google Font CSS and convert to embedded @font-face with base64 data
-async function embedGoogleFont(fontFamily: string): Promise<string> {
-  const cssUrl = GOOGLE_FONTS_CSS[fontFamily];
-  if (!cssUrl) return '';
-
-  try {
-    // Fetch the CSS (need to set user-agent to get woff2 URLs)
-    const cssRes = await fetch(cssUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      },
-    });
-    let css = await cssRes.text();
-
-    // Find all url() references and replace with base64 data
-    const urlRegex = /url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/g;
-    const matches: RegExpExecArray[] = [];
-    let m: RegExpExecArray | null;
-    while ((m = urlRegex.exec(css)) !== null) {
-      matches.push(m);
-    }
-
-    for (const match of matches) {
-      try {
-        const fontRes = await fetch(match[1]);
-        const fontBlob = await fontRes.blob();
-        const base64 = await blobToBase64(fontBlob);
-        css = css.replace(match[0], `url(${base64})`);
-      } catch {
-        // Skip this font file if it fails
-      }
-    }
-
-    return css;
-  } catch {
-    return '';
-  }
-}
-
-function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-
 // Render story HTML to PNG blob in the browser
-async function renderStoryToPng(html: string, fontFamily: string): Promise<Blob> {
-  // Embed the font
-  const embeddedFontCss = await embedGoogleFont(fontFamily);
-
+async function renderStoryToPng(html: string): Promise<Blob> {
+  
   // Create hidden container
   const container = document.createElement('div');
   container.style.position = 'fixed';
@@ -98,13 +30,6 @@ async function renderStoryToPng(html: string, fontFamily: string): Promise<Blob>
   // Parse the HTML and extract body content + styles
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
-
-  // Inject embedded font CSS
-  if (embeddedFontCss) {
-    const fontStyle = document.createElement('style');
-    fontStyle.textContent = embeddedFontCss;
-    container.appendChild(fontStyle);
-  }
 
   // Copy all style tags from the generated HTML
   const styles = doc.querySelectorAll('style');
@@ -141,13 +66,14 @@ async function renderStoryToPng(html: string, fontFamily: string): Promise<Blob>
 
   try {
     // Use html-to-image
-    const { toPng } = await import('html-to-image');
-    const dataUrl = await toPng(wrapper, {
+    const htmlToImage = await import('html-to-image');
+    const fontEmbedCSS = await htmlToImage.getFontEmbedCSS(wrapper);
+    const dataUrl = await htmlToImage.toPng(wrapper, {
       width: STORY_WIDTH,
       height: STORY_HEIGHT,
       pixelRatio: 1,
       cacheBust: true,
-      skipFonts: true, // We already embedded them
+      fontEmbedCSS,
       style: {
         transform: 'none',
       },
@@ -218,7 +144,7 @@ export default function ExportButton({ fullWidth = false }: { fullWidth?: boolea
       });
 
       // Render to PNG in the browser
-      const blob = await renderStoryToPng(html, config.fontFamily);
+      const blob = await renderStoryToPng(html);
 
       // Create download
       const url = URL.createObjectURL(blob);
