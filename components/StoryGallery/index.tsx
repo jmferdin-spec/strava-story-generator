@@ -473,7 +473,7 @@ export default function StoryGallery() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {GALLERY_PRESETS.map((preset, idx) => (
           <GalleryCard
             key={preset.name}
