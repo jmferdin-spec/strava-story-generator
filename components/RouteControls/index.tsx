@@ -25,15 +25,19 @@ const GLOW_LEVELS = [
 ];
 
 function SliderControl({
-  label, value, min, max, step, onChange, format,
+  label, value, min, max, step, onChange, format, icon,
 }: {
   label: string; value: number; min: number; max: number;
   step: number; onChange: (v: number) => void; format?: (v: number) => string;
+  icon?: React.ReactNode;
 }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-[11px] text-[#6B6B78]">{label}</label>
+        <div className="flex items-center gap-1.5">
+          {icon && <span className="text-[#6B6B78]">{icon}</span>}
+          <label className="text-[11px] text-[#6B6B78]">{label}</label>
+        </div>
         <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[rgba(255,255,255,0.04)] text-[#E8E8EA]">
           {format ? format(value) : value}
         </span>
@@ -50,6 +54,7 @@ export default function RouteControls() {
     config,
     setShowRoute, setRouteColor, setRouteThickness,
     setRouteOpacity, setRoutePosition, setRouteGlowIntensity,
+    setRouteOffsetX, setRouteOffsetY, setRouteScale,
     selectedActivity,
   } = useStoryStore();
 
@@ -77,6 +82,13 @@ export default function RouteControls() {
           opacity={0.9}/>
       </svg>
     );
+  };
+
+  const handleResetPosition = () => {
+    setRouteOffsetX(0);
+    setRouteOffsetY(0);
+    setRouteScale(100);
+    setRoutePosition('middle');
   };
 
   return (
@@ -110,6 +122,96 @@ export default function RouteControls() {
 
       {config.showRoute && hasPolyline && (
         <>
+          {/* ─── Position & Size ─── */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] text-[#6B6B78]">Position & Size</p>
+              <button
+                onClick={handleResetPosition}
+                className="text-[10px] text-[#6B6B78] hover:text-[#FC4C02] transition-colors"
+              >
+                Reset
+              </button>
+            </div>
+            <div
+              className="p-3 rounded-xl space-y-4"
+              style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
+            >
+              <SliderControl
+                label="Horizontal"
+                value={config.routeOffsetX ?? 0}
+                min={-50} max={50} step={1}
+                onChange={setRouteOffsetX}
+                format={(v) => `${v > 0 ? '+' : ''}${v}%`}
+                icon={
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                    <path d="M2 6h8M9 4l1.5 2-1.5 2M3 4L1.5 6 3 8"/>
+                  </svg>
+                }
+              />
+              <SliderControl
+                label="Vertical"
+                value={config.routeOffsetY ?? 0}
+                min={-50} max={50} step={1}
+                onChange={setRouteOffsetY}
+                format={(v) => `${v > 0 ? '+' : ''}${v}%`}
+                icon={
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                    <path d="M6 2v8M4 9l2 1.5L8 9M4 3l2-1.5L8 3"/>
+                  </svg>
+                }
+              />
+              <SliderControl
+                label="Scale"
+                value={config.routeScale ?? 100}
+                min={30} max={250} step={5}
+                onChange={setRouteScale}
+                format={(v) => `${v}%`}
+                icon={
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                    <circle cx="5" cy="5" r="3.5"/>
+                    <path d="M8 8l2.5 2.5"/>
+                    <path d="M3.5 5h3M5 3.5v3"/>
+                  </svg>
+                }
+              />
+            </div>
+          </div>
+
+          {/* ─── Placement preset ─── */}
+          <div>
+            <p className="text-[11px] text-[#6B6B78] mb-2">Quick Placement</p>
+            <div className="grid grid-cols-4 gap-2">
+              {POSITION_OPTIONS.map((pos) => {
+                const isSel = config.routePosition === pos.value;
+                return (
+                  <button
+                    key={pos.value}
+                    onClick={() => {
+                      setRoutePosition(pos.value);
+                      setRouteOffsetX(0);
+                      setRouteOffsetY(0);
+                      if (pos.value === 'background') {
+                        setRouteScale(150);
+                      } else {
+                        setRouteScale(100);
+                      }
+                    }}
+                    className="flex flex-col items-center gap-0.5 py-2 rounded-xl transition-all"
+                    style={{
+                      background: isSel ? 'rgba(252,76,2,0.08)' : 'rgba(255,255,255,0.02)',
+                      border: `1px solid ${isSel ? 'rgba(252,76,2,0.3)' : 'rgba(255,255,255,0.05)'}`,
+                    }}
+                  >
+                    <p className="text-[10px] font-medium" style={{ color: isSel ? '#FC4C02' : '#E8E8EA' }}>
+                      {pos.label}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* ─── Glow intensity ─── */}
           <div>
             <p className="text-[11px] text-[#6B6B78] mb-2">Glow Effect</p>
@@ -202,32 +304,6 @@ export default function RouteControls() {
               min={0.1} max={1} step={0.05}
               onChange={setRouteOpacity} format={(v) => `${Math.round(v * 100)}%`}
             />
-          </div>
-
-          {/* ─── Position ─── */}
-          <div>
-            <p className="text-[11px] text-[#6B6B78] mb-2">Placement</p>
-            <div className="grid grid-cols-2 gap-2">
-              {POSITION_OPTIONS.map((pos) => {
-                const isSel = config.routePosition === pos.value;
-                return (
-                  <button
-                    key={pos.value}
-                    onClick={() => setRoutePosition(pos.value)}
-                    className="flex flex-col items-start p-3 rounded-xl transition-all text-left"
-                    style={{
-                      background: isSel ? 'rgba(252,76,2,0.08)' : 'rgba(255,255,255,0.02)',
-                      border: `1px solid ${isSel ? 'rgba(252,76,2,0.3)' : 'rgba(255,255,255,0.05)'}`,
-                    }}
-                  >
-                    <p className="text-xs font-medium" style={{ color: isSel ? '#FC4C02' : '#E8E8EA' }}>
-                      {pos.label}
-                    </p>
-                    <p className="text-[10px] text-[#6B6B78] mt-0.5">{pos.description}</p>
-                  </button>
-                );
-              })}
-            </div>
           </div>
         </>
       )}

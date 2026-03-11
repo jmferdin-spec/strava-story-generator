@@ -66,182 +66,252 @@ async function renderStoryToPng(html: string): Promise<Blob> {
   }
 }
 
-export default function ExportButton({ fullWidth = false }: { fullWidth?: boolean }) {
+// Shared function to generate story blob
+function useStoryExport() {
   const { config, selectedActivity } = useStoryStore();
-  const [state, setState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  const generateBlob = useCallback(async (): Promise<{ blob: Blob; fileName: string }> => {
+    const units = (config.units || 'imperial') as UnitSystem;
+    const activity = config.activity || selectedActivity;
+
+    const stats = activity
+      ? {
+          distance: formatDistanceValue(activity.distance, units),
+          time: formatTime(activity.moving_time),
+          pace: formatPaceValue(activity.average_speed, units),
+          elevation: formatElevation(activity.total_elevation_gain, units),
+          date: formatDateShort(activity.start_date_local),
+        }
+      : {
+          distance: units === 'imperial' ? '6.54' : '10.52',
+          time: '52:43',
+          pace: units === 'imperial' ? '8:04' : '5:01',
+          elevation: units === 'imperial' ? '407ft' : '124m',
+          date: 'Mar 9, 2024',
+        };
+
+    let routeSvg: string | undefined;
+    if (config.showRoute && activity?.map?.summary_polyline) {
+      routeSvg = generateRouteSvg(activity.map.summary_polyline, {
+        width: STORY_WIDTH,
+        height: STORY_HEIGHT * 0.4,
+        color: config.routeColor,
+        thickness: config.routeThickness,
+        opacity: config.routeOpacity,
+        padding: 80,
+        glowIntensity: config.routeGlowIntensity ?? 1,
+      });
+    }
+
+    const html = generateStoryHtml({
+      backgroundImage: config.backgroundImage,
+      routeSvg,
+      stats,
+      visibleStats: config.visibleStats,
+      config,
+    });
+
+    const blob = await renderStoryToPng(html);
+
+    const activityName = selectedActivity?.name
+      ? selectedActivity.name.replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 40)
+      : 'strava-story';
+    const fileName = `${activityName}-story.png`;
+
+    return { blob, fileName };
+  }, [config, selectedActivity]);
+
+  return generateBlob;
+}
+
+export default function ExportButton({ fullWidth = false }: { fullWidth?: boolean }) {
+  const [exportState, setExportState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [shareState, setShareState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const generateBlob = useStoryExport();
+
+  const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const canShare = typeof navigator !== 'undefined' && 'canShare' in navigator;
+
+  // Export (download only)
   const handleExport = useCallback(async () => {
-    if (state === 'loading') return;
-    setState('loading');
+    if (exportState === 'loading') return;
+    setExportState('loading');
     setErrorMsg(null);
 
     try {
-      const units = (config.units || 'metric') as UnitSystem;
-      const activity = config.activity || selectedActivity;
-
-      // Generate stats
-      const stats = activity
-        ? {
-            distance: formatDistanceValue(activity.distance, units),
-            time: formatTime(activity.moving_time),
-            pace: formatPaceValue(activity.average_speed, units),
-            elevation: formatElevation(activity.total_elevation_gain, units),
-            date: formatDateShort(activity.start_date_local),
-          }
-        : {
-            distance: units === 'imperial' ? '6.54' : '10.52',
-            time: '52:43',
-            pace: units === 'imperial' ? '8:04' : '5:01',
-            elevation: units === 'imperial' ? '407ft' : '124m',
-            date: 'Mar 9, 2024',
-          };
-
-      // Generate route SVG
-      let routeSvg: string | undefined;
-      if (config.showRoute && activity?.map?.summary_polyline) {
-        routeSvg = generateRouteSvg(activity.map.summary_polyline, {
-          width: STORY_WIDTH,
-          height: STORY_HEIGHT * 0.4,
-          color: config.routeColor,
-          thickness: config.routeThickness,
-          opacity: config.routeOpacity,
-          padding: 80,
-          glowIntensity: config.routeGlowIntensity ?? 1,
-        });
-      }
-
-      // Generate HTML
-      const html = generateStoryHtml({
-        backgroundImage: config.backgroundImage,
-        routeSvg,
-        stats,
-        visibleStats: config.visibleStats,
-        config,
-      });
-
-      // Render to PNG in the browser
-      const blob = await renderStoryToPng(html);
-
-      // Create download
+      const { blob, fileName } = await generateBlob();
       const url = URL.createObjectURL(blob);
-      const activityName = selectedActivity?.name
-        ? selectedActivity.name.replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 40)
-        : 'strava-story';
-      const fileName = `${activityName}-story.png`;
 
-      // Always download first
       const a = document.createElement('a');
       a.href = url;
       a.download = fileName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-
-      // On mobile, also offer share
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const file = new File([blob], fileName, { type: 'image/png' });
-      if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: 'My Strava Story',
-            text: 'Generated with StoryRun',
-          });
-        } catch {
-          // User cancelled share — file already saved
-        }
-      }
-
       URL.revokeObjectURL(url);
-      setState('success');
-      setTimeout(() => setState('idle'), 3000);
+
+      setExportState('success');
+      setTimeout(() => setExportState('idle'), 3000);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Export failed';
+      console.error('Export error:', err);
+      setErrorMsg(msg);
+      setExportState('error');
+      setTimeout(() => setExportState('idle'), 5000);
+    }
+  }, [exportState, generateBlob]);
+
+  // Share (share dialog)
+  const handleShare = useCallback(async () => {
+    if (shareState === 'loading') return;
+    setShareState('loading');
+    setErrorMsg(null);
+
+    try {
+      const { blob, fileName } = await generateBlob();
+      const file = new File([blob], fileName, { type: 'image/png' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'My Strava Story',
+          text: 'Generated with StoryRun',
+        });
+        setShareState('success');
+        setTimeout(() => setShareState('idle'), 3000);
+      } else {
+        // Fallback: just download
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setShareState('success');
+        setTimeout(() => setShareState('idle'), 3000);
+      }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
-        setState('idle');
+        setShareState('idle');
         return;
       }
-      const msg = err instanceof Error ? err.message : 'Export failed';
-      console.error('Browser export error:', err);
+      const msg = err instanceof Error ? err.message : 'Share failed';
+      console.error('Share error:', err);
       setErrorMsg(msg);
-      setState('error');
-      setTimeout(() => setState('idle'), 5000);
+      setShareState('error');
+      setTimeout(() => setShareState('idle'), 5000);
     }
-  }, [state, config, selectedActivity]);
+  }, [shareState, generateBlob]);
 
-  const buttonStyles = {
-    idle: {
-      background: 'linear-gradient(135deg, #FC4C02 0%, #E63E00 100%)',
-      color: 'white',
-    },
-    loading: {
-      background: 'rgba(252,76,2,0.3)',
-      color: '#FC4C02',
-    },
-    success: {
-      background: 'rgba(0,200,100,0.15)',
-      color: '#00C864',
-      border: '1px solid rgba(0,200,100,0.25)',
-    },
-    error: {
-      background: 'rgba(239,68,68,0.15)',
-      color: '#EF4444',
-      border: '1px solid rgba(239,68,68,0.25)',
-    },
+  const getButtonStyle = (state: string) => {
+    switch (state) {
+      case 'loading':
+        return { background: 'rgba(252,76,2,0.3)', color: '#FC4C02' };
+      case 'success':
+        return { background: 'rgba(0,200,100,0.15)', color: '#00C864', border: '1px solid rgba(0,200,100,0.25)' };
+      case 'error':
+        return { background: 'rgba(239,68,68,0.15)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.25)' };
+      default:
+        return {};
+    }
   };
 
-  const isMobileShare = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const renderButtonContent = (state: string, loadingText: string, idleText: string, idleIcon: React.ReactNode) => {
+    if (state === 'loading') return (
+      <>
+        <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin flex-shrink-0"
+          style={{ borderColor: '#FC4C02', borderTopColor: 'transparent' }} />
+        <span>{loadingText}</span>
+      </>
+    );
+    if (state === 'success') return (
+      <>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span>Done!</span>
+      </>
+    );
+    if (state === 'error') return (
+      <>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5"/>
+          <path d="M8 5v4M8 11v0.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+        <span>Failed</span>
+      </>
+    );
+    return (
+      <>
+        {idleIcon}
+        <span>{idleText}</span>
+      </>
+    );
+  };
 
   return (
     <div className={`relative ${fullWidth ? 'w-full' : ''}`}>
-      <button
-        onClick={handleExport}
-        disabled={state === 'loading'}
-        className={`flex items-center justify-center gap-2 px-4 rounded-lg text-sm font-medium transition-all ${fullWidth ? 'w-full py-3' : 'py-2'}`}
-        style={{
-          ...buttonStyles[state],
-          boxShadow: state === 'idle'
-            ? '0 2px 12px rgba(252,76,2,0.3)'
-            : 'none',
-        }}
-        title={state === 'error' ? errorMsg || 'Export failed' : undefined}
-      >
-        {state === 'loading' ? (
-          <>
-            <div
-              className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin flex-shrink-0"
-              style={{ borderColor: '#FC4C02', borderTopColor: 'transparent' }}
-            />
-            <span>Generating…</span>
-          </>
-        ) : state === 'success' ? (
-          <>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span>Downloaded!</span>
-          </>
-        ) : state === 'error' ? (
-          <>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5"/>
-              <path d="M8 5v4M8 11v0.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-            <span>Failed</span>
-          </>
-        ) : (
-          <>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <div className={`flex gap-2 ${fullWidth ? 'w-full' : ''}`}>
+        {/* Export / Download button */}
+        <button
+          onClick={handleExport}
+          disabled={exportState === 'loading'}
+          className={`flex items-center justify-center gap-2 px-4 rounded-lg text-sm font-medium transition-all ${fullWidth ? 'flex-1 py-3' : 'py-2'}`}
+          style={{
+            background: exportState === 'idle'
+              ? 'linear-gradient(135deg, #FC4C02 0%, #E63E00 100%)'
+              : undefined,
+            color: exportState === 'idle' ? 'white' : undefined,
+            boxShadow: exportState === 'idle' ? '0 2px 12px rgba(252,76,2,0.3)' : 'none',
+            ...getButtonStyle(exportState),
+          }}
+        >
+          {renderButtonContent(
+            exportState,
+            'Saving…',
+            'Export',
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
               <path d="M8 2v8M5 8l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
-            <span>{isMobileShare ? 'Export & Share' : 'Export PNG'}</span>
-          </>
+          )}
+        </button>
+
+        {/* Share button — only show on mobile or if share API available */}
+        {(isMobile || canShare) && (
+          <button
+            onClick={handleShare}
+            disabled={shareState === 'loading'}
+            className={`flex items-center justify-center gap-2 px-4 rounded-lg text-sm font-medium transition-all ${fullWidth ? 'flex-1 py-3' : 'py-2'}`}
+            style={{
+              background: shareState === 'idle'
+                ? 'rgba(255,255,255,0.06)'
+                : undefined,
+              color: shareState === 'idle' ? '#E8E8EA' : undefined,
+              border: shareState === 'idle' ? '1px solid rgba(255,255,255,0.1)' : undefined,
+              ...getButtonStyle(shareState),
+            }}
+          >
+            {renderButtonContent(
+              shareState,
+              'Sharing…',
+              'Share',
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <circle cx="12" cy="4" r="2" stroke="currentColor" strokeWidth="1.5"/>
+                <circle cx="4" cy="8" r="2" stroke="currentColor" strokeWidth="1.5"/>
+                <circle cx="12" cy="12" r="2" stroke="currentColor" strokeWidth="1.5"/>
+                <path d="M6 7l4-2M6 9l4 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            )}
+          </button>
         )}
-      </button>
+      </div>
 
       {/* Error tooltip */}
-      {state === 'error' && errorMsg && (
+      {(exportState === 'error' || shareState === 'error') && errorMsg && (
         <div
           className="absolute right-0 top-full mt-2 p-3 rounded-xl text-xs text-red-400 z-50 w-64 animate-fade-in"
           style={{
@@ -250,7 +320,7 @@ export default function ExportButton({ fullWidth = false }: { fullWidth?: boolea
             boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
           }}
         >
-          <p className="font-medium mb-1">Export failed</p>
+          <p className="font-medium mb-1">Something went wrong</p>
           <p className="text-[#6B6B78]">{errorMsg}</p>
         </div>
       )}
