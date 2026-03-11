@@ -119,6 +119,9 @@ export interface StoryConfig {
   routeOpacity: number;
   routePosition: RoutePosition;
   routeGlowIntensity: number;
+  routeOffsetX: number;
+  routeOffsetY: number;
+  routeScale: number;
   statVerticalOffset: number;
   units: UnitSystem;
 }
