@@ -186,24 +186,28 @@ function GalleryCard({
   return (
     <div className="flex flex-col rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)', background: '#111113' }}>
       {/* Preview */}
-      <div className="relative overflow-hidden" style={{ aspectRatio: '9/16' }}>
+      <div className="relative overflow-hidden w-full" style={{ aspectRatio: '9/16' }}>
         <iframe
           srcDoc={html}
-          className="border-0 pointer-events-none"
+          className="border-0 pointer-events-none absolute top-0 left-0"
           style={{
             width: STORY_WIDTH,
             height: STORY_HEIGHT,
-            transform: `scale(${1 / (STORY_WIDTH / 100)})`,
+            transform: 'scale(var(--preview-scale))',
             transformOrigin: 'top left',
-            position: 'absolute',
-            top: 0,
-            left: 0,
           }}
           sandbox="allow-same-origin"
           title={preset.name}
+          ref={(el) => {
+            if (el) {
+              const parent = el.parentElement;
+              if (parent) {
+                const s = parent.clientWidth / STORY_WIDTH;
+                el.style.setProperty('--preview-scale', String(s));
+              }
+            }
+          }}
         />
-        {/* Scale wrapper to fit the card */}
-        <div className="absolute inset-0" style={{ pointerEvents: 'none' }} />
       </div>
 
       {/* Info + actions */}
