@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { exchangeCodeForToken } from '@/lib/strava';
 
-const SESSION_DURATION = 60 * 60 * 4; // 4 hours
+const SESSION_DURATION = 60 * 60 * 2; // 2 hours
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
