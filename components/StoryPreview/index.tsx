@@ -6,7 +6,7 @@ import { generateStoryHtml } from '@/lib/storyTemplates';
 import { generateRouteSvg } from '@/lib/routeRenderer';
 import {
   formatDistanceValue, formatTime, formatPaceValue,
-  formatElevation, formatDateShort,
+  formatElevation, formatDateShort, formatCalories, formatHeartRate,
 } from '@/lib/strava';
 import { GRID_SIZE, STORY_WIDTH, STORY_HEIGHT, type StatPosition } from '@/types';
 import RouteToolbar from '@/components/RouteToolbar';
@@ -319,14 +319,17 @@ export default function StoryPreview() {
   const stats = useMemo(() => {
     const units = config.units || 'metric';
     if (!selectedActivity) return {
-      distance: units === 'imperial' ? '6.54' : '10.52', time: '52:43', pace: units === 'imperial' ? '8:04' : '5:01', elevation: units === 'imperial' ? '407ft' : '124m', date: 'Mar 9, 2024',
+      distance: units === 'imperial' ? '6.54' : '10.52', time: '52:43', pace: units === 'imperial' ? '8:04' : '5:01', elevation: units === 'imperial' ? '407ft' : '124m', heartrate: '–', calories: '–', date: 'Mar 9, 2024', description: '',
     };
     return {
       distance: formatDistanceValue(selectedActivity.distance, units),
       time: formatTime(selectedActivity.moving_time),
       pace: formatPaceValue(selectedActivity.average_speed, units),
       elevation: formatElevation(selectedActivity.total_elevation_gain, units),
+      heartrate: selectedActivity.average_heartrate ? formatHeartRate(selectedActivity.average_heartrate) : '–',
+      calories: selectedActivity.calories ? formatCalories(selectedActivity.calories) : '–',
       date: formatDateShort(selectedActivity.start_date_local),
+      description: selectedActivity.description || '',
     };
   }, [selectedActivity, config.units]);
 
