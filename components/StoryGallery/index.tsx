@@ -380,7 +380,10 @@ export default function StoryGallery() {
         time: formatTime(selectedActivity.moving_time),
         pace: formatPaceValue(selectedActivity.average_speed, units),
         elevation: formatElevation(selectedActivity.total_elevation_gain, units),
+        heartrate: selectedActivity.average_heartrate ? String(Math.round(selectedActivity.average_heartrate)) : '–',
+        calories: selectedActivity.calories ? String(Math.round(selectedActivity.calories)) : '–',
         date: formatDateShort(selectedActivity.start_date_local),
+        description: selectedActivity.description || '',
       } : stats;
 
       let routeSvg: string | undefined;
