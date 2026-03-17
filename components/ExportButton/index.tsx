@@ -83,7 +83,7 @@ function useStoryExport() {
           heartrate: activity.average_heartrate ? formatHeartRate(activity.average_heartrate) : '–',
           calories: activity.calories ? formatCalories(activity.calories) : '–',
           date: formatDateShort(activity.start_date_local),
-          description: activity.description || '',
+          description: activity.name || '',
         }
       : {
           distance: units === 'imperial' ? '6.54' : '10.52',
