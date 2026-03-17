@@ -10,7 +10,10 @@ const STATS: { key: StatKey; label: string; icon: string; descriptions: Record<U
   { key: 'time', label: 'Moving Time', icon: '⏱️', descriptions: { metric: 'Active duration', imperial: 'Active duration' } },
   { key: 'pace', label: 'Average Pace', icon: '⚡', descriptions: { metric: 'Min per kilometer', imperial: 'Min per mile' } },
   { key: 'elevation', label: 'Elevation Gain', icon: '⛰️', descriptions: { metric: 'Total meters climbed', imperial: 'Total feet climbed' } },
+  { key: 'heartrate', label: 'Avg Heart Rate', icon: '❤️', descriptions: { metric: 'Beats per minute', imperial: 'Beats per minute' } },
+  { key: 'calories', label: 'Calories', icon: '🔥', descriptions: { metric: 'Energy burned', imperial: 'Energy burned' } },
   { key: 'date', label: 'Date', icon: '📅', descriptions: { metric: 'Activity date', imperial: 'Activity date' } },
+  { key: 'description', label: 'Run Description', icon: '💬', descriptions: { metric: 'Your activity notes', imperial: 'Your activity notes' } },
 ];
 
 const ALIGNMENTS: { value: StatAlignment; icon: React.ReactNode; label: string }[] = [
@@ -101,6 +104,7 @@ export default function StatControls() {
     setStatVerticalOffset,
     setStatHorizontalOffset,
     setUnits,
+    selectedActivity,
   } = useStoryStore();
 
   const units = config.units || 'imperial';
@@ -109,6 +113,11 @@ export default function StatControls() {
     setStatVerticalOffset(75);
     setStatHorizontalOffset(0);
   };
+
+  // Check if activity has optional data
+  const hasHeartRate = Boolean(selectedActivity?.average_heartrate);
+  const hasCalories = Boolean(selectedActivity?.calories);
+  const hasDescription = Boolean(selectedActivity?.description);
 
   return (
     <div className="p-4 space-y-5">
@@ -146,6 +155,13 @@ export default function StatControls() {
         <div className="space-y-2">
           {STATS.map((stat) => {
             const isVisible = config.visibleStats[stat.key];
+            // Show availability hint for optional stats
+            const isAvailable =
+              stat.key === 'heartrate' ? hasHeartRate :
+              stat.key === 'calories' ? hasCalories :
+              stat.key === 'description' ? hasDescription :
+              true;
+
             return (
               <button
                 key={stat.key}
@@ -156,6 +172,7 @@ export default function StatControls() {
                     ? 'rgba(252,76,2,0.06)'
                     : 'rgba(255,255,255,0.02)',
                   border: `1px solid ${isVisible ? 'rgba(252,76,2,0.2)' : 'rgba(255,255,255,0.05)'}`,
+                  opacity: isAvailable ? 1 : 0.5,
                 }}
               >
                 <div className="flex items-center gap-2.5">
@@ -167,7 +184,11 @@ export default function StatControls() {
                     >
                       {stat.label}
                     </p>
-                    <p className="text-[10px] text-[#3A3A44]">{stat.descriptions[units]}</p>
+                    <p className="text-[10px] text-[#3A3A44]">
+                      {!isAvailable && selectedActivity
+                        ? 'Not available for this run'
+                        : stat.descriptions[units]}
+                    </p>
                   </div>
                 </div>
 

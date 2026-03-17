@@ -22,7 +22,10 @@ export const DEFAULT_CONFIG: Omit<StoryConfig, 'activity'> = {
     time: true,
     pace: true,
     elevation: true,
+    heartrate: false,
+    calories: false,
     date: true,
+    description: false,
   },
   statAlignment: 'center',
   statPosition: { x: 540, y: 1440 },
@@ -184,14 +187,20 @@ export interface StoryRenderData {
     time: string;
     pace: string;
     elevation: string;
+    heartrate: string;
+    calories: string;
     date: string;
+    description: string;
   };
   visibleStats: {
     distance: boolean;
     time: boolean;
     pace: boolean;
     elevation: boolean;
+    heartrate: boolean;
+    calories: boolean;
     date: boolean;
+    description: boolean;
   };
   config: StoryConfig;
 }
@@ -490,12 +499,15 @@ function getMinimalStatBlock(
   if (visibleStats.time) row2.push(`<div class="stat-item"><div class="stat-label">Time</div><div class="stat-value" style="font-size:${Math.round(config.fontSize * 0.72)}px">${stats.time}</div></div>`);
   if (visibleStats.pace) row2.push(`<div class="stat-item"><div class="stat-label">Pace</div><div class="stat-value" style="font-size:${Math.round(config.fontSize * 0.72)}px">${stats.pace}<span class="stat-unit">${u.pace}</span></div></div>`);
   if (visibleStats.elevation) row2.push(`<div class="stat-item"><div class="stat-label">Elevation</div><div class="stat-value" style="font-size:${Math.round(config.fontSize * 0.72)}px">${stats.elevation}</div></div>`);
+  if (visibleStats.heartrate && stats.heartrate !== '–') row2.push(`<div class="stat-item"><div class="stat-label">Avg HR</div><div class="stat-value" style="font-size:${Math.round(config.fontSize * 0.72)}px">${stats.heartrate}<span class="stat-unit">bpm</span></div></div>`);
+  if (visibleStats.calories && stats.calories !== '–') row2.push(`<div class="stat-item"><div class="stat-label">Calories</div><div class="stat-value" style="font-size:${Math.round(config.fontSize * 0.72)}px">${stats.calories}<span class="stat-unit">cal</span></div></div>`);
 
   return `<div class="stat-block">
     <div class="stat-divider"></div>
     ${visibleStats.distance ? `<div class="stat-item"><div class="stat-label">Distance</div><div class="stat-value">${stats.distance}<span class="stat-unit">${u.distance}</span></div></div>` : ''}
     ${row2.length > 0 ? `<div class="stats-grid">${row2.join('')}</div>` : ''}
     ${visibleStats.date ? `<div class="stat-date">${stats.date}</div>` : ''}
+    ${visibleStats.description && stats.description ? `<div style="margin-top:16px;font-size:${Math.round(config.fontSize * 0.26)}px;color:${config.labelColor};line-height:1.4;max-width:600px;font-style:italic">"${stats.description}"</div>` : ''}
   </div>`;
 }
 
@@ -512,8 +524,11 @@ function getLargeCenterStatBlock(
       ${visibleStats.time ? `<div class="stat-item"><div class="stat-label">Time</div><div class="stat-value" style="font-size:${config.fontSize * 0.8}px">${stats.time}</div></div>` : ''}
       ${visibleStats.pace ? `<div class="stat-item"><div class="stat-label">Pace</div><div class="stat-value" style="font-size:${config.fontSize * 0.8}px">${stats.pace}</div></div>` : ''}
       ${visibleStats.elevation ? `<div class="stat-item"><div class="stat-label">Elevation</div><div class="stat-value" style="font-size:${config.fontSize * 0.8}px">${stats.elevation}</div></div>` : ''}
+      ${visibleStats.heartrate && stats.heartrate !== '–' ? `<div class="stat-item"><div class="stat-label">Avg HR</div><div class="stat-value" style="font-size:${config.fontSize * 0.8}px">${stats.heartrate}<span class="stat-unit" style="font-size:${config.fontSize * 0.3}px"> bpm</span></div></div>` : ''}
+      ${visibleStats.calories && stats.calories !== '–' ? `<div class="stat-item"><div class="stat-label">Calories</div><div class="stat-value" style="font-size:${config.fontSize * 0.8}px">${stats.calories}</div></div>` : ''}
     </div>
     ${visibleStats.date ? `<div class="stat-date">${stats.date}</div>` : ''}
+    ${visibleStats.description && stats.description ? `<div style="margin-top:16px;font-size:${Math.round(config.fontSize * 0.26)}px;color:${config.labelColor};line-height:1.4;max-width:600px;text-align:center;margin-left:auto;margin-right:auto;font-style:italic">"${stats.description}"</div>` : ''}
   </div>`;
 }
 
@@ -528,6 +543,8 @@ function getGradientBarStatBlock(
     visibleStats.time && `<div class="stat-item" style="text-align:center"><div class="stat-label">Time</div><div class="stat-value" style="font-size:${config.fontSize * 0.72}px">${stats.time}</div></div>`,
     visibleStats.pace && `<div class="stat-item" style="text-align:center"><div class="stat-label">Pace</div><div class="stat-value" style="font-size:${config.fontSize * 0.72}px">${stats.pace}</div></div>`,
     visibleStats.elevation && `<div class="stat-item" style="text-align:center"><div class="stat-label">Elevation</div><div class="stat-value" style="font-size:${config.fontSize * 0.72}px">${stats.elevation}</div></div>`,
+    visibleStats.heartrate && stats.heartrate !== '–' && `<div class="stat-item" style="text-align:center"><div class="stat-label">Avg HR</div><div class="stat-value" style="font-size:${config.fontSize * 0.72}px">${stats.heartrate}<span style="font-size:0.38em;margin-left:4px">bpm</span></div></div>`,
+    visibleStats.calories && stats.calories !== '–' && `<div class="stat-item" style="text-align:center"><div class="stat-label">Calories</div><div class="stat-value" style="font-size:${config.fontSize * 0.72}px">${stats.calories}</div></div>`,
   ].filter(Boolean);
 
   return `<div class="stat-block">
@@ -535,6 +552,7 @@ function getGradientBarStatBlock(
       ${items.join('')}
     </div>
     ${visibleStats.date ? `<div class="stat-date" style="margin-top:20px;text-align:center">${stats.date}</div>` : ''}
+    ${visibleStats.description && stats.description ? `<div style="margin-top:14px;font-size:${Math.round(config.fontSize * 0.26)}px;color:${config.labelColor};line-height:1.4;text-align:center;font-style:italic">"${stats.description}"</div>` : ''}
   </div>`;
 }
 
@@ -551,8 +569,11 @@ function getAthletePosterStatBlock(
       ${visibleStats.time ? `<div><div class="stat-label">Moving Time</div><div class="stat-value" style="font-size:${config.fontSize * 0.65}px">${stats.time}</div></div>` : ''}
       ${visibleStats.pace ? `<div><div class="stat-label">Avg Pace</div><div class="stat-value" style="font-size:${config.fontSize * 0.65}px">${stats.pace}</div></div>` : ''}
       ${visibleStats.elevation ? `<div><div class="stat-label">Elevation</div><div class="stat-value" style="font-size:${config.fontSize * 0.65}px">${stats.elevation}</div></div>` : ''}
+      ${visibleStats.heartrate && stats.heartrate !== '–' ? `<div><div class="stat-label">Avg HR</div><div class="stat-value" style="font-size:${config.fontSize * 0.65}px">${stats.heartrate} <span style="font-size:0.4em">bpm</span></div></div>` : ''}
+      ${visibleStats.calories && stats.calories !== '–' ? `<div><div class="stat-label">Calories</div><div class="stat-value" style="font-size:${config.fontSize * 0.65}px">${stats.calories}</div></div>` : ''}
     </div>
     ${visibleStats.date ? `<div class="stat-date" style="margin-top:28px;font-size:${config.fontSize * 0.24}px">${stats.date}</div>` : ''}
+    ${visibleStats.description && stats.description ? `<div style="margin-top:18px;font-size:${Math.round(config.fontSize * 0.24)}px;color:${config.labelColor};line-height:1.4;max-width:600px;font-style:italic">"${stats.description}"</div>` : ''}
   </div>`;
 }
 

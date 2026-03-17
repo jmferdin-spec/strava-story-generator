@@ -6,7 +6,7 @@ import { generateStoryHtml } from '@/lib/storyTemplates';
 import { generateRouteSvg } from '@/lib/routeRenderer';
 import {
   formatDistanceValue, formatTime, formatPaceValue,
-  formatElevation, formatDateShort,
+  formatElevation, formatDateShort, formatCalories, formatHeartRate,
 } from '@/lib/strava';
 import type { UnitSystem } from '@/types';
 
@@ -80,14 +80,20 @@ function useStoryExport() {
           time: formatTime(activity.moving_time),
           pace: formatPaceValue(activity.average_speed, units),
           elevation: formatElevation(activity.total_elevation_gain, units),
+          heartrate: activity.average_heartrate ? formatHeartRate(activity.average_heartrate) : '–',
+          calories: activity.calories ? formatCalories(activity.calories) : '–',
           date: formatDateShort(activity.start_date_local),
+          description: activity.description || '',
         }
       : {
           distance: units === 'imperial' ? '6.54' : '10.52',
           time: '52:43',
           pace: units === 'imperial' ? '8:04' : '5:01',
           elevation: units === 'imperial' ? '407ft' : '124m',
+          heartrate: '–',
+          calories: '–',
           date: 'Mar 9, 2024',
+          description: '',
         };
 
     let routeSvg: string | undefined;

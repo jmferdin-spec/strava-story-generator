@@ -212,6 +212,15 @@ export function formatElevationUnit(units: UnitSystem = 'metric'): string {
   return units === 'imperial' ? 'ft' : 'm';
 }
 
+export function formatCalories(calories: number): string {
+  if (calories >= 1000) return `${(calories / 1000).toFixed(1)}k`;
+  return `${Math.round(calories)}`;
+}
+
+export function formatHeartRate(bpm: number): string {
+  return `${Math.round(bpm)}`;
+}
+
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
   return date.toLocaleDateString('en-US', {

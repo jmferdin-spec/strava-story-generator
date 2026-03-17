@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { exchangeCodeForToken } from '@/lib/strava';
 
+const SESSION_DURATION = 60 * 60 * 4; // 4 hours
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
@@ -36,7 +38,7 @@ export async function GET(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      maxAge: SESSION_DURATION,
       path: '/',
     });
 
@@ -44,7 +46,7 @@ export async function GET(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30,
+      maxAge: SESSION_DURATION,
       path: '/',
     });
 
@@ -63,7 +65,7 @@ export async function GET(request: NextRequest) {
         httpOnly: false, // Client-readable
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 30,
+        maxAge: SESSION_DURATION,
         path: '/',
       }
     );

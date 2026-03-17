@@ -22,6 +22,8 @@ export interface StravaActivity {
   max_speed: number;
   average_heartrate?: number;
   max_heartrate?: number;
+  calories?: number;
+  description?: string;
   start_date: string;
   start_date_local: string;
   timezone: string;
@@ -90,7 +92,10 @@ export interface StatVisibility {
   time: boolean;
   pace: boolean;
   elevation: boolean;
+  heartrate: boolean;
+  calories: boolean;
   date: boolean;
+  description: boolean;
 }
 
 export interface StoryConfig {
