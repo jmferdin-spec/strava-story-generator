@@ -190,7 +190,7 @@ export default function ExportButton({ fullWidth = false }: { fullWidth?: boolea
         await navigator.share({
           files: [file],
           title: 'My Strava Story',
-          text: 'Generated with StoryRun',
+          text: 'Generated with StoryMiles',
         });
         setShareState('success');
         setTimeout(() => setShareState('idle'), 3000);
