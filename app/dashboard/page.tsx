@@ -119,16 +119,8 @@ function Header({
       }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2.5">
-        <div
-          className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ background: '#FC4C02' }}
-        >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <path d="M8 2L10.5 7H14L9.5 10.5L11 14L8 11.5L5 14L6.5 10.5L2 7H5.5L8 2Z" fill="white"/>
-          </svg>
-        </div>
-        <span className="text-white text-sm font-semibold tracking-tight">StoryMiles</span>
+      <div className="flex items-center">
+        <img src="/storymiles-logo.png" alt="StoryMiles" style={{ height: 28 }} />
       </div>
 
       {/* Desktop workflow steps */}
