@@ -62,8 +62,8 @@ function EditTabContent({ tab }: { tab: EditTab }) {
 
 // ─── Edit tab bar ─────────────────────────────────────────────────────────────
 const EDIT_TABS: { id: EditTab; label: string }[] = [
-  { id: 'template', label: 'Templates' },
   { id: 'photo',    label: 'Photo' },
+  { id: 'template', label: 'Templates' },
   { id: 'style',    label: 'Style' },
   { id: 'stats',    label: 'Stats' },
   { id: 'route',    label: 'Route' },
@@ -173,8 +173,8 @@ export default function DashboardPage() {
   const { setActivities, setActivitiesLoading, setActivitiesError, setAthlete, athlete } = useStoryStore();
 
   const [mobileScreen, setMobileScreen] = useState<MobileScreen>('runs');
-  const [editTab, setEditTab] = useState<EditTab>('template');
-  const [desktopTab, setDesktopTab] = useState<DesktopTab>('template');
+  const [editTab, setEditTab] = useState<EditTab>('photo');
+  const [desktopTab, setDesktopTab] = useState<DesktopTab>('photo');
 
   const fetchActivities = useCallback(async () => {
     setActivitiesLoading(true);
