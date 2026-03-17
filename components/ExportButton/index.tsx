@@ -48,8 +48,9 @@ async function renderStoryToPng(html: string): Promise<Blob> {
   await document.fonts.ready;
   await new Promise((r) => setTimeout(r, 500));
 
-  // If no background image, make export transparent
-    if (storyEl.style.backgroundImage === '' || !storyEl.style.backgroundImage) {
+ // If no background image, make export transparent
+    const computedBg = window.getComputedStyle(storyEl).backgroundImage;
+    if (!computedBg || computedBg === 'none') {
       storyEl.style.background = 'transparent';
       const overlay = storyEl.querySelector('.overlay') as HTMLElement;
       if (overlay) overlay.style.background = 'transparent';
