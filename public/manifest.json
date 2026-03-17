@@ -1,6 +1,6 @@
 {
-  "name": "StoryRun – Strava Story Generator",
-  "short_name": "StoryRun",
+  "name": "StoryMiles – Strava Story Generator",
+  "short_name": "StoryMiles",
   "description": "Turn your Strava runs into stunning Instagram Stories",
   "start_url": "/",
   "display": "standalone",
