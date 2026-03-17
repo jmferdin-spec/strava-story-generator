@@ -183,7 +183,15 @@ export default function DashboardPage() {
     setActivitiesError(null);
     try {
       const res = await fetch('/api/strava/activities');
-      if (res.status === 401) { router.push('/'); return; }
+      if (res.status === 401) {
+        // Clear all cookies to break redirect loop
+        document.cookie = 'strava_athlete=; path=/; max-age=0';
+        document.cookie = 'strava_access_token=; path=/; max-age=0';
+        document.cookie = 'strava_refresh_token=; path=/; max-age=0';
+        document.cookie = 'strava_expires_at=; path=/; max-age=0';
+        router.push('/');
+        return;
+      }
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       setActivities(data.activities);
