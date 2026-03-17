@@ -212,9 +212,9 @@ export function generateStoryHtml(data: StoryRenderData): string {
 
   const bgStyle = backgroundImage
     ? `background-image: url('${backgroundImage}'); background-size: cover; background-position: center;`
-    : `background: linear-gradient(155deg, #0d1117 0%, #161b27 40%, #0f1923 100%);`;
+    : `background: transparent;`;
 
-  const overlayStyle = getOverlayStyle(config);
+  const overlayStyle = backgroundImage ? getOverlayStyle(config) : 'background: transparent;';
 
   // If run name is showing at top (with date), hide date from stat block
   const effectiveVisibleStats = { ...visibleStats };
