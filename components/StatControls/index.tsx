@@ -13,7 +13,7 @@ const STATS: { key: StatKey; label: string; icon: string; descriptions: Record<U
   { key: 'heartrate', label: 'Avg Heart Rate', icon: '❤️', descriptions: { metric: 'Beats per minute', imperial: 'Beats per minute' } },
   { key: 'calories', label: 'Calories', icon: '🔥', descriptions: { metric: 'Energy burned', imperial: 'Energy burned' } },
   { key: 'date', label: 'Date', icon: '📅', descriptions: { metric: 'Activity date', imperial: 'Activity date' } },
-  { key: 'description', label: 'Run Description', icon: '💬', descriptions: { metric: 'Your activity notes', imperial: 'Your activity notes' } },
+  { key: 'description', label: 'Run Name', icon: '💬', descriptions: { metric: 'Activity title', imperial: 'Activity title' } },
 ];
 
 const ALIGNMENTS: { value: StatAlignment; icon: React.ReactNode; label: string }[] = [
