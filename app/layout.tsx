@@ -11,13 +11,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'StoryRun – Strava Story Generator',
+  title: 'StoryMiles – Strava Story Generator',
   description: 'Turn your Strava runs into stunning Instagram Stories',
-  applicationName: 'StoryRun',
+  applicationName: 'StoryMiles',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'StoryRun',
+    title: 'StoryMiles',
   },
   formatDetection: {
     telephone: false,
@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* iOS Safari PWA */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="StoryRun" />
+        <meta name="apple-mobile-web-app-title" content="StoryMiles" />
 
         {/* Splash screen colour for Android */}
         <meta name="msapplication-TileColor" content="#FC4C02" />
