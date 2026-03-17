@@ -13,6 +13,7 @@ import RouteControls from '@/components/RouteControls';
 import ImageUploader from '@/components/ImageUploader';
 import ExportButton from '@/components/ExportButton';
 import StoryGallery from '@/components/StoryGallery';
+import ActivityPickerModal, { SelectedRunBar } from '@/components/ActivityPickerModal';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type MobileScreen = 'runs' | 'preview' | 'edit';
@@ -175,6 +176,7 @@ export default function DashboardPage() {
   const [mobileScreen, setMobileScreen] = useState<MobileScreen>('runs');
   const [editTab, setEditTab] = useState<EditTab>('photo');
   const [desktopTab, setDesktopTab] = useState<DesktopTab>('photo');
+  const [showRunPicker, setShowRunPicker] = useState(false);
 
   const fetchActivities = useCallback(async () => {
     setActivitiesLoading(true);
@@ -277,31 +279,23 @@ export default function DashboardPage() {
         </aside>
       </div>
 
-      {/* ── TABLET layout (md–lg): 2 columns with bottom export ── */}
+      {/* ── TABLET / FOLD layout (md–lg): 2 columns ── */}
       <div className="hidden md:flex lg:hidden flex-1 overflow-hidden">
-        {/* Left: Activity + Preview stacked */}
+        {/* Left: Preview + selected run bar */}
         <div className="flex flex-col flex-1 overflow-hidden">
-          {/* Preview takes most space */}
           <div className="flex-1 overflow-hidden bg-[#0D0D0F] relative">
             <StoryPreview />
           </div>
-          {/* Activity selector below preview */}
-          <div
-            className="flex-shrink-0 overflow-hidden"
-            style={{ height: 200, borderTop: '1px solid rgba(255,255,255,0.06)', background: '#111113' }}
-          >
-            <ActivitySelector />
-          </div>
+          <SelectedRunBar onTap={() => setShowRunPicker(true)} />
         </div>
 
-        {/* Right: Full controls panel */}
+        {/* Right: Controls panel */}
         <aside
           className="flex-shrink-0 flex flex-col overflow-hidden"
           style={{ width: 300, borderLeft: '1px solid rgba(255,255,255,0.06)', background: '#111113' }}
         >
           <EditTabBar active={desktopTab} onChange={setDesktopTab} />
           <EditTabContent tab={desktopTab} />
-          {/* Export at bottom of right panel */}
           <div
             className="flex-shrink-0 p-3"
             style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
@@ -309,6 +303,9 @@ export default function DashboardPage() {
             <ExportButton fullWidth />
           </div>
         </aside>
+
+        {/* Run picker modal */}
+        <ActivityPickerModal isOpen={showRunPicker} onClose={() => setShowRunPicker(false)} />
       </div>
 
       {/* ── MOBILE layout (<md): Full-screen cards with bottom nav ── */}
