@@ -261,14 +261,20 @@ export default function StoryGallery() {
       time: '52:43',
       pace: units === 'imperial' ? '8:04' : '5:01',
       elevation: units === 'imperial' ? '407ft' : '124m',
+      heartrate: '–',
+      calories: '–',
       date: 'Mar 9, 2024',
+      description: '',
     };
     return {
       distance: formatDistanceValue(selectedActivity.distance, units),
       time: formatTime(selectedActivity.moving_time),
       pace: formatPaceValue(selectedActivity.average_speed, units),
       elevation: formatElevation(selectedActivity.total_elevation_gain, units),
+      heartrate: selectedActivity.average_heartrate ? String(Math.round(selectedActivity.average_heartrate)) : '–',
+      calories: selectedActivity.calories ? String(Math.round(selectedActivity.calories)) : '–',
       date: formatDateShort(selectedActivity.start_date_local),
+      description: selectedActivity.description || '',
     };
   }, [selectedActivity, units]);
 
