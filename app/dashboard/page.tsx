@@ -296,12 +296,6 @@ export default function DashboardPage() {
         >
           <EditTabBar active={desktopTab} onChange={setDesktopTab} />
           <EditTabContent tab={desktopTab} />
-          <div
-            className="flex-shrink-0 p-3"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
-          >
-            <ExportButton fullWidth />
-          </div>
         </aside>
 
         {/* Run picker modal */}
