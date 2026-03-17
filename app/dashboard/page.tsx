@@ -207,6 +207,30 @@ export default function DashboardPage() {
     router.push('/');
   };
 
+  // Fetch full activity details when a run is selected (for calories, description, etc.)
+  const currentSelectedId = useStoryStore((s) => s.selectedActivity?.id);
+  useEffect(() => {
+    const state = useStoryStore.getState();
+    const activity = state.selectedActivity;
+    if (!activity) return;
+    if (activity.calories !== undefined) return;
+
+    const enrichWithDetails = async () => {
+      try {
+        const res = await fetch(`/api/strava/activity?id=${activity.id}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.activity) {
+          useStoryStore.getState().selectActivity({
+            ...activity,
+            ...data.activity,
+          });
+        }
+      } catch {}
+    };
+    enrichWithDetails();
+  }, [currentSelectedId]);
+  
   // When user selects a run on mobile, auto-navigate to preview
   const { selectActivity: originalSelectActivity } = useStoryStore();
   const handleActivitySelect = useCallback(() => {
