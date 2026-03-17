@@ -65,7 +65,7 @@ function LandingPage() {
               <path d="M8 2L10.5 7H14L9.5 10.5L11 14L8 11.5L5 14L6.5 10.5L2 7H5.5L8 2Z" fill="white" />
             </svg>
           </div>
-          <span className="text-white font-semibold tracking-tight">StoryRun</span>
+          <span className="text-white font-semibold tracking-tight">StoryMiles</span>
         </div>
         <a
           href="https://github.com"
