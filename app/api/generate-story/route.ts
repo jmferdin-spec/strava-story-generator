@@ -94,9 +94,12 @@ async function renderLocally(
         time:      formatTime(activity.moving_time),
         pace:      formatPaceValue(activity.average_speed, units),
         elevation: formatElevation(activity.total_elevation_gain, units),
+        heartrate: activity.average_heartrate ? String(Math.round(activity.average_heartrate)) : '–',
+        calories:  activity.calories ? String(Math.round(activity.calories)) : '–',
         date:      formatDateShort(activity.start_date_local),
+        description: activity.description || '',
       }
-    : { distance: '10.00', time: '52:30', pace: '5:15', elevation: units === 'imperial' ? '394ft' : '120m', date: 'Jan 1, 2024' };
+    : { distance: '10.00', time: '52:30', pace: '5:15', elevation: units === 'imperial' ? '394ft' : '120m', heartrate: '–', calories: '–', date: 'Jan 1, 2024', description: '' };
 
   let routeSvg: string | undefined;
   if (config.showRoute && activity?.map?.summary_polyline) {
@@ -192,13 +195,16 @@ export async function GET(request: NextRequest) {
     const units = config.units || 'metric';
     const stats = activity
       ? {
-          distance:  formatDistanceValue(activity.distance, units),
-          time:      formatTime(activity.moving_time),
-          pace:      formatPaceValue(activity.average_speed, units),
-          elevation: formatElevation(activity.total_elevation_gain, units),
-          date:      formatDateShort(activity.start_date_local),
-        }
-      : { distance: '10.00', time: '52:30', pace: '5:15', elevation: units === 'imperial' ? '394ft' : '120m', date: 'Jan 1, 2024' };
+        distance:  formatDistanceValue(activity.distance, units),
+        time:      formatTime(activity.moving_time),
+        pace:      formatPaceValue(activity.average_speed, units),
+        elevation: formatElevation(activity.total_elevation_gain, units),
+        heartrate: activity.average_heartrate ? String(Math.round(activity.average_heartrate)) : '–',
+        calories:  activity.calories ? String(Math.round(activity.calories)) : '–',
+        date:      formatDateShort(activity.start_date_local),
+        description: activity.description || '',
+      }
+    : { distance: '10.00', time: '52:30', pace: '5:15', elevation: units === 'imperial' ? '394ft' : '120m', heartrate: '–', calories: '–', date: 'Jan 1, 2024', description: '' };
 
     let routeSvg: string | undefined;
     if (config.showRoute && activity?.map?.summary_polyline) {
