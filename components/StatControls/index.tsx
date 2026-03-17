@@ -13,7 +13,7 @@ const STATS: { key: StatKey; label: string; icon: string; descriptions: Record<U
   { key: 'heartrate', label: 'Avg Heart Rate', icon: '❤️', descriptions: { metric: 'Beats per minute', imperial: 'Beats per minute' } },
   { key: 'calories', label: 'Calories', icon: '🔥', descriptions: { metric: 'Energy burned', imperial: 'Energy burned' } },
   { key: 'date', label: 'Date', icon: '📅', descriptions: { metric: 'Activity date', imperial: 'Activity date' } },
-  { key: 'description', label: 'Run Name', icon: '💬', descriptions: { metric: 'Activity title', imperial: 'Activity title' } },
+  { key: 'description', label: 'Run Name', icon: '💬', descriptions: { metric: 'Activity title shown at top', imperial: 'Activity title shown at top' } },
 ];
 
 const ALIGNMENTS: { value: StatAlignment; icon: React.ReactNode; label: string }[] = [
@@ -117,7 +117,7 @@ export default function StatControls() {
   // Check if activity has optional data
   const hasHeartRate = Boolean(selectedActivity?.average_heartrate);
   const hasCalories = Boolean(selectedActivity?.calories);
-  const hasDescription = Boolean(selectedActivity?.description);
+  const hasDescription = Boolean(selectedActivity?.name);
 
   return (
     <div className="p-4 space-y-5">

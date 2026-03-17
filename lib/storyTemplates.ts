@@ -274,12 +274,38 @@ export function generateStoryHtml(data: StoryRenderData): string {
       left: 0; right: 0;
     }
 
+    .title-block {
+      position: absolute;
+      top: 140px;
+      left: 80px;
+      right: 80px;
+      z-index: 5;
+    }
+    .title-name {
+      font-family: '${config.fontFamily}', sans-serif;
+      font-size: ${Math.round(config.fontSize * 0.38)}px;
+      font-weight: ${config.fontWeight};
+      color: ${config.statColor};
+      line-height: 1.2;
+      margin-bottom: 8px;
+      ${config.letterSpacing ? `letter-spacing: ${config.letterSpacing}em;` : ''}
+    }
+    .title-date {
+      font-family: '${config.fontFamily}', sans-serif;
+      font-size: ${Math.round(config.fontSize * 0.22)}px;
+      font-weight: 400;
+      color: ${config.labelColor};
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
     ${getTemplateStyles(config, absPos)}
   </style>
 </head>
 <body>
   <div class="story">
     <div class="overlay"></div>
+    ${visibleStats.description && stats.description ? `<div class="title-block" style="text-align:${config.statAlignment}"><div class="title-name">${stats.description}</div>${visibleStats.date ? `<div class="title-date">${stats.date}</div>` : ''}</div>` : ''}
     ${routeHtml}
     <div class="safe-zone">
       ${statBlockHtml}
@@ -507,7 +533,6 @@ function getMinimalStatBlock(
     ${visibleStats.distance ? `<div class="stat-item"><div class="stat-label">Distance</div><div class="stat-value">${stats.distance}<span class="stat-unit">${u.distance}</span></div></div>` : ''}
     ${row2.length > 0 ? `<div class="stats-grid">${row2.join('')}</div>` : ''}
     ${visibleStats.date ? `<div class="stat-date">${stats.date}</div>` : ''}
-    ${visibleStats.description && stats.description ? `<div style="margin-top:16px;font-size:${Math.round(config.fontSize * 0.26)}px;color:${config.labelColor};line-height:1.4;max-width:600px;font-style:italic">"${stats.description}"</div>` : ''}
   </div>`;
 }
 
@@ -528,7 +553,6 @@ function getLargeCenterStatBlock(
       ${visibleStats.calories && stats.calories !== '–' ? `<div class="stat-item"><div class="stat-label">Calories</div><div class="stat-value" style="font-size:${config.fontSize * 0.8}px">${stats.calories}</div></div>` : ''}
     </div>
     ${visibleStats.date ? `<div class="stat-date">${stats.date}</div>` : ''}
-    ${visibleStats.description && stats.description ? `<div style="margin-top:16px;font-size:${Math.round(config.fontSize * 0.26)}px;color:${config.labelColor};line-height:1.4;max-width:600px;text-align:center;margin-left:auto;margin-right:auto;font-style:italic">"${stats.description}"</div>` : ''}
   </div>`;
 }
 
@@ -552,7 +576,6 @@ function getGradientBarStatBlock(
       ${items.join('')}
     </div>
     ${visibleStats.date ? `<div class="stat-date" style="margin-top:20px;text-align:center">${stats.date}</div>` : ''}
-    ${visibleStats.description && stats.description ? `<div style="margin-top:14px;font-size:${Math.round(config.fontSize * 0.26)}px;color:${config.labelColor};line-height:1.4;text-align:center;font-style:italic">"${stats.description}"</div>` : ''}
   </div>`;
 }
 
@@ -573,7 +596,6 @@ function getAthletePosterStatBlock(
       ${visibleStats.calories && stats.calories !== '–' ? `<div><div class="stat-label">Calories</div><div class="stat-value" style="font-size:${config.fontSize * 0.65}px">${stats.calories}</div></div>` : ''}
     </div>
     ${visibleStats.date ? `<div class="stat-date" style="margin-top:28px;font-size:${config.fontSize * 0.24}px">${stats.date}</div>` : ''}
-    ${visibleStats.description && stats.description ? `<div style="margin-top:18px;font-size:${Math.round(config.fontSize * 0.24)}px;color:${config.labelColor};line-height:1.4;max-width:600px;font-style:italic">"${stats.description}"</div>` : ''}
   </div>`;
 }
 
