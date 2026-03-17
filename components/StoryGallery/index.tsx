@@ -186,7 +186,7 @@ function GalleryCard({
   return (
     <div className="flex flex-col rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)', background: '#111113' }}>
       {/* Preview */}
-      <div className="relative overflow-hidden w-full" style={{ aspectRatio: '9/16' }}>
+      <div className="relative overflow-hidden w-full cursor-pointer" style={{ aspectRatio: '9/16' }} onClick={onApply}>
         <iframe
           srcDoc={html}
           className="border-0 pointer-events-none absolute top-0 left-0"
