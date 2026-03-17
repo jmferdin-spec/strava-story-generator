@@ -274,7 +274,7 @@ export default function StoryGallery() {
       heartrate: selectedActivity.average_heartrate ? String(Math.round(selectedActivity.average_heartrate)) : '–',
       calories: selectedActivity.calories ? String(Math.round(selectedActivity.calories)) : '–',
       date: formatDateShort(selectedActivity.start_date_local),
-      description: selectedActivity.description || '',
+      description: selectedActivity.name || '',
     };
   }, [selectedActivity, units]);
 
@@ -383,7 +383,7 @@ export default function StoryGallery() {
         heartrate: selectedActivity.average_heartrate ? String(Math.round(selectedActivity.average_heartrate)) : '–',
         calories: selectedActivity.calories ? String(Math.round(selectedActivity.calories)) : '–',
         date: formatDateShort(selectedActivity.start_date_local),
-        description: selectedActivity.description || '',
+        description: selectedActivity.name || '',
       } : stats;
 
       let routeSvg: string | undefined;
