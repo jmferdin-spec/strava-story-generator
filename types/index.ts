@@ -129,6 +129,7 @@ export interface StoryConfig {
   routeScale: number;
   statVerticalOffset: number;
   statHorizontalOffset: number;
+  titleFontSize: number;
   units: UnitSystem;
 }
 

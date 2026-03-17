@@ -41,6 +41,7 @@ export const DEFAULT_CONFIG: Omit<StoryConfig, 'activity'> = {
   routeScale: 100,
   statVerticalOffset: 75,
   statHorizontalOffset: 0,
+  titleFontSize: 36,
   units: 'imperial',
 };
 
@@ -214,7 +215,14 @@ export function generateStoryHtml(data: StoryRenderData): string {
     : `background: linear-gradient(155deg, #0d1117 0%, #161b27 40%, #0f1923 100%);`;
 
   const overlayStyle = getOverlayStyle(config);
-  const statBlockHtml = getStatBlockHtml(stats, visibleStats, config);
+
+  // If run name is showing at top (with date), hide date from stat block
+  const effectiveVisibleStats = { ...visibleStats };
+  if (visibleStats.description && stats.description) {
+    effectiveVisibleStats.date = false;
+  }
+
+  const statBlockHtml = getStatBlockHtml(stats, effectiveVisibleStats, config);
 
   const routeHtml = config.showRoute && routeSvg
     ? `<div class="route-container route-${config.routePosition}">${routeSvg}</div>`
@@ -283,7 +291,7 @@ export function generateStoryHtml(data: StoryRenderData): string {
     }
     .title-name {
       font-family: '${config.fontFamily}', sans-serif;
-      font-size: ${Math.round(config.fontSize * 0.38)}px;
+      font-size: ${config.titleFontSize || 36}px;
       font-weight: ${config.fontWeight};
       color: ${config.statColor};
       line-height: 1.2;
@@ -292,7 +300,7 @@ export function generateStoryHtml(data: StoryRenderData): string {
     }
     .title-date {
       font-family: '${config.fontFamily}', sans-serif;
-      font-size: ${Math.round(config.fontSize * 0.22)}px;
+      font-size: ${Math.round((config.titleFontSize || 36) * 0.55)}px;
       font-weight: 400;
       color: ${config.labelColor};
       letter-spacing: 0.14em;

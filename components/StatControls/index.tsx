@@ -103,6 +103,7 @@ export default function StatControls() {
     setStatAlignment,
     setStatVerticalOffset,
     setStatHorizontalOffset,
+    setTitleFontSize,
     setUnits,
     selectedActivity,
   } = useStoryStore();
@@ -212,6 +213,35 @@ export default function StatControls() {
           })}
         </div>
       </div>
+
+      {/* Title font size (only when Run Name is on) */}
+      {config.visibleStats.description && (
+        <div
+          className="p-3 rounded-xl"
+          style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.05)',
+          }}
+        >
+          <SliderControl
+            label="Run Name Size"
+            value={config.titleFontSize ?? 36}
+            min={16}
+            max={72}
+            step={1}
+            onChange={setTitleFontSize}
+            format={(v) => `${v}px`}
+            icon={
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                <path d="M2 9h8M4 2l2 7M8 2L6 9"/>
+              </svg>
+            }
+          />
+          <p className="text-[10px] text-[#3A3A44] mt-2">
+            Adjusts the run name shown at the top of the story.
+          </p>
+        </div>
+      )}
 
       {/* Alignment */}
       <div>
