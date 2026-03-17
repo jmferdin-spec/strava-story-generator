@@ -56,16 +56,8 @@ function LandingPage() {
 
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-8 py-6">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: '#FC4C02' }}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 2L10.5 7H14L9.5 10.5L11 14L8 11.5L5 14L6.5 10.5L2 7H5.5L8 2Z" fill="white" />
-            </svg>
-          </div>
-          <span className="text-white font-semibold tracking-tight">StoryMiles</span>
+        <div className="flex items-center">
+          <img src="/storymiles-logo-large.png" alt="StoryMiles" style={{ height: 36 }} />
         </div>
         <a
           href="https://github.com"
