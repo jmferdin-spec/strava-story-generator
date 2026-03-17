@@ -97,7 +97,7 @@ async function renderLocally(
         heartrate: activity.average_heartrate ? String(Math.round(activity.average_heartrate)) : '–',
         calories:  activity.calories ? String(Math.round(activity.calories)) : '–',
         date:      formatDateShort(activity.start_date_local),
-        description: activity.description || '',
+        description: activity.name || '',
       }
     : { distance: '10.00', time: '52:30', pace: '5:15', elevation: units === 'imperial' ? '394ft' : '120m', heartrate: '–', calories: '–', date: 'Jan 1, 2024', description: '' };
 
@@ -202,7 +202,7 @@ export async function GET(request: NextRequest) {
         heartrate: activity.average_heartrate ? String(Math.round(activity.average_heartrate)) : '–',
         calories:  activity.calories ? String(Math.round(activity.calories)) : '–',
         date:      formatDateShort(activity.start_date_local),
-        description: activity.description || '',
+        description: activity.name || '',
       }
     : { distance: '10.00', time: '52:30', pace: '5:15', elevation: units === 'imperial' ? '394ft' : '120m', heartrate: '–', calories: '–', date: 'Jan 1, 2024', description: '' };
 
