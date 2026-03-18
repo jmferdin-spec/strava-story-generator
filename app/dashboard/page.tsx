@@ -152,6 +152,9 @@ function Header({
         >
           Disconnect
         </button>
+        <div className="w-px h-4 bg-[rgba(255,255,255,0.08)]" />
+        <a href="/about" className="text-xs text-[#6B6B78] hover:text-white transition-colors">?</a>
+        <a href="https://venmo.com/joeferdin" target="_blank" rel="noopener noreferrer" className="text-xs hover:scale-110 transition-transform" title="Support StoryMiles">☕</a>
         <div className="hidden sm:block">
           <ExportButton />
         </div>
