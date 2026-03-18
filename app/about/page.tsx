@@ -9,7 +9,7 @@ export default function AboutPage() {
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText('https://strava-story-generator.vercel.app');
+      await navigator.clipboard.writeText('https://storymiles.app');
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (_err) {
