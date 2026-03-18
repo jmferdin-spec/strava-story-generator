@@ -60,7 +60,7 @@ function LandingPage() {
           <img src="/storymiles-logo-large.png" alt="StoryMiles" style={{ height: 36 }} />
         </div>
         
-          href="/about"
+        <a href="/about"
           className="text-sm text-[#6B6B78] hover:text-white transition-colors"
         >
           About
