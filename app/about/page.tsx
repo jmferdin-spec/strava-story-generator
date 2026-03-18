@@ -1,9 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function AboutPage() {
   const router = useRouter();
+
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText('https://strava-story-generator.vercel.app');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-[#E8E8EA]">
@@ -145,6 +158,38 @@ export default function AboutPage() {
           </div>
         </div>
 
+        {/* Share */}
+        <div
+          className="p-6 rounded-2xl text-center"
+          style={{ background: 'rgba(252,76,2,0.04)', border: '1px solid rgba(252,76,2,0.15)' }}
+        >
+          <h2 className="text-xl font-semibold mb-3">Share StoryMiles</h2>
+          <p className="text-sm text-[#6B6B78] mb-5">
+            Know someone who'd love this? Share StoryMiles with your running crew!
+          </p>
+          <button
+            onClick={handleCopyLink}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-105"
+            style={{
+              background: copied ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.06)',
+              border: copied ? '1px solid rgba(34,197,94,0.3)' : '1px solid rgba(255,255,255,0.1)',
+              color: copied ? '#22c55e' : '#E8E8EA',
+            }}
+          >
+            {copied ? (
+              <>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 8.5l3 3 7-7"/></svg>
+                Link Copied!
+              </>
+            ) : (
+              <>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="5" y="5" width="8" height="8" rx="1.5"/><path d="M3 11V3h8"/></svg>
+                Copy Link
+              </>
+            )}
+          </button>
+        </div>
+        
         {/* Support / Donate */}
         <div
           className="p-6 rounded-2xl text-center"
