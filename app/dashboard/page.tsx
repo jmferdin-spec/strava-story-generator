@@ -153,8 +153,8 @@ function Header({
           Disconnect
         </button>
         <div className="w-px h-4 bg-[rgba(255,255,255,0.08)]" />
-        <a href="/about" className="text-xs text-[#6B6B78] hover:text-white transition-colors">?</a>
-        <a href="https://venmo.com/joeferdin" target="_blank" rel="noopener noreferrer" className="text-xs hover:scale-110 transition-transform" title="Support StoryMiles">☕</a>
+        <a href="/about" className="w-8 h-8 rounded-full flex items-center justify-center text-sm text-[#6B6B78] hover:text-white transition-all hover:scale-110" style={{ background: 'rgba(255,255,255,0.04)' }} title="About">?</a>
+        <a href="https://venmo.com/joeferdin" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full flex items-center justify-center text-sm hover:scale-110 transition-all" style={{ background: 'rgba(255,255,255,0.04)' }} title="Support StoryMiles">☕</a>
         <div className="hidden sm:block">
           <ExportButton />
         </div>
