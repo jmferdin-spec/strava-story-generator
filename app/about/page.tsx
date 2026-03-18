@@ -13,7 +13,7 @@ export default function AboutPage() {
       await navigator.clipboard.writeText('https://strava-story-generator.vercel.app');
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
+    } catch (_) {
       // fallback
     }
   };
