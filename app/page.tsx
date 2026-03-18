@@ -59,31 +59,17 @@ function LandingPage() {
         <div className="flex items-center">
           <img src="/storymiles-logo-large.png" alt="StoryMiles" style={{ height: 36 }} />
         </div>
-        <a
-          href="https://github.com"
+        
+          href="/about"
           className="text-sm text-[#6B6B78] hover:text-white transition-colors"
-          target="_blank"
-          rel="noopener noreferrer"
         >
-          GitHub →
+          About
         </a>
       </header>
 
       {/* Main content */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center">
-        {/* Badge */}
-        <div
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-8"
-          style={{
-            background: 'rgba(252, 76, 2, 0.12)',
-            border: '1px solid rgba(252, 76, 2, 0.25)',
-            color: '#FC4C02',
-          }}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#FC4C02] animate-pulse" />
-          Connected to Strava API
-        </div>
-
+        
         {/* Hero heading */}
         <h1
           className="text-6xl sm:text-7xl font-bold text-white tracking-tight leading-none mb-6 max-w-4xl"
@@ -165,8 +151,18 @@ function LandingPage() {
           )}
         </button>
 
-        <a href="/about" className="text-sm text-[#6B6B78] hover:text-white transition-colors mt-4 inline-block">
-          Learn more about StoryMiles →
+        <a href="/about"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all hover:scale-105 mt-4"
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: '#E8E8EA',
+          }}
+        >
+          Learn about StoryMiles
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+            <path d="M5 3l4 4-4 4"/>
+          </svg>
         </a>
 
         <p className="mt-4 text-xs text-[#3A3A44]">
