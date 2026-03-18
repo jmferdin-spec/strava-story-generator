@@ -200,31 +200,33 @@ function CropModal({ imageSrc, onCrop, onCancel }: CropModalProps) {
       </div>
 
       {/* Canvas area */}
-      <div
-        ref={containerRef}
-        className="flex-1 relative overflow-hidden flex items-center justify-center"
-        style={{ touchAction: 'none' }}
-      >
-        <canvas
-          ref={canvasRef}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-          className="block"
-          style={{
-            cursor: isDragging ? 'grabbing' : 'grab',
-            touchAction: 'none',
-          }}
-        />
-        {/* Crop frame overlay */}
-        <div className="absolute inset-0 pointer-events-none">
-          {/* Rule of thirds grid */}
-          <div className="absolute inset-0" style={{ opacity: isDragging ? 0.4 : 0 }}>
-            <div className="absolute" style={{ left: '33.33%', top: 0, bottom: 0, width: 1, background: 'rgba(255,255,255,0.3)' }} />
-            <div className="absolute" style={{ left: '66.66%', top: 0, bottom: 0, width: 1, background: 'rgba(255,255,255,0.3)' }} />
-            <div className="absolute" style={{ top: '33.33%', left: 0, right: 0, height: 1, background: 'rgba(255,255,255,0.3)' }} />
-            <div className="absolute" style={{ top: '66.66%', left: 0, right: 0, height: 1, background: 'rgba(255,255,255,0.3)' }} />
+      <div className="flex-1 relative overflow-hidden flex items-center justify-center">
+        <div
+          ref={containerRef}
+          className="relative overflow-hidden h-full"
+          style={{ touchAction: 'none', aspectRatio: '9/16', maxHeight: '100%' }}
+        >
+          <canvas
+            ref={canvasRef}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+            className="block"
+            style={{
+              cursor: isDragging ? 'grabbing' : 'grab',
+              touchAction: 'none',
+            }}
+          />
+          {/* Crop frame overlay */}
+          <div className="absolute inset-0 pointer-events-none">
+            {/* Rule of thirds grid */}
+            <div className="absolute inset-0" style={{ opacity: isDragging ? 0.4 : 0 }}>
+              <div className="absolute" style={{ left: '33.33%', top: 0, bottom: 0, width: 1, background: 'rgba(255,255,255,0.3)' }} />
+              <div className="absolute" style={{ left: '66.66%', top: 0, bottom: 0, width: 1, background: 'rgba(255,255,255,0.3)' }} />
+              <div className="absolute" style={{ top: '33.33%', left: 0, right: 0, height: 1, background: 'rgba(255,255,255,0.3)' }} />
+              <div className="absolute" style={{ top: '66.66%', left: 0, right: 0, height: 1, background: 'rgba(255,255,255,0.3)' }} />
+            </div>
           </div>
         </div>
       </div>
