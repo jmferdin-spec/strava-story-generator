@@ -165,6 +165,10 @@ function LandingPage() {
           )}
         </button>
 
+        <a href="/about" className="text-sm text-[#6B6B78] hover:text-white transition-colors mt-4 inline-block">
+          Learn more about StoryMiles →
+        </a>
+
         <p className="mt-4 text-xs text-[#3A3A44]">
           We only read your activity data — never write or post on your behalf.
         </p>
