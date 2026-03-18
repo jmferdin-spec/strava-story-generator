@@ -103,6 +103,18 @@ export default function AboutPage() {
 
         <div
           className="p-6 rounded-2xl"
+          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
+        >
+          <h2 className="text-xl font-semibold mb-3">Transparent Overlay Mode</h2>
+          <p className="text-sm text-[#6B6B78] leading-relaxed">
+            No photo? No problem. Export your stats and route as a transparent PNG and use it
+            as a sticker overlay on videos or photos directly in your Instagram Story editor.
+            Just skip the photo upload, hit Export, and layer it over anything.
+          </p>
+        </div>
+
+        <div
+          className="p-6 rounded-2xl"
           style={{ background: 'rgba(252,76,2,0.04)', border: '1px solid rgba(252,76,2,0.15)' }}
         >
           <h2 className="text-xl font-semibold mb-3">Install on Your Phone</h2>
