@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       const newTokenData = await refreshAccessToken(refreshToken);
       accessToken = newTokenData.access_token;
 
-      const activities = await getActivities(accessToken, 1, 20);
+      const activities = await getActivities(accessToken, 1, 50);
       const response = NextResponse.json({ activities });
 
       // Update tokens in cookies
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const page = parseInt(request.nextUrl.searchParams.get('page') || '1');
-    const activities = await getActivities(accessToken, page, 20);
+    const activities = await getActivities(accessToken, page, 50);
     return NextResponse.json({ activities });
   } catch (err) {
     if (err instanceof Error && err.message === 'UNAUTHORIZED') {
