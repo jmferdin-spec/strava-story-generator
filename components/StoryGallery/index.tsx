@@ -6,7 +6,7 @@ import { generateStoryHtml } from '@/lib/storyTemplates';
 import { generateRouteSvg } from '@/lib/routeRenderer';
 import {
   formatDistanceValue, formatTime, formatPaceValue,
-  formatElevation, formatDateShort,
+  formatElevation, formatDateShort, formatLaps,
 } from '@/lib/strava';
 import type { StoryConfig, TemplateId, FontFamily, FontWeight, OverlayType, RoutePosition, UnitSystem } from '@/types';
 
@@ -305,6 +305,7 @@ export default function StoryGallery() {
         backgroundImage: config.backgroundImage,
         routeSvg,
         stats,
+        laps: selectedActivity?.laps ? formatLaps(selectedActivity.laps, units) : undefined,
         visibleStats: presetConfig.visibleStats,
         config: presetConfig,
       });
@@ -403,6 +404,7 @@ export default function StoryGallery() {
         backgroundImage: config.backgroundImage,
         routeSvg,
         stats: pStats,
+        laps: selectedActivity?.laps ? formatLaps(selectedActivity.laps, units) : undefined,
         visibleStats: presetConfig.visibleStats,
         config: presetConfig,
       });
