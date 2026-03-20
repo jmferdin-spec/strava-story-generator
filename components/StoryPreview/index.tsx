@@ -6,7 +6,7 @@ import { generateStoryHtml } from '@/lib/storyTemplates';
 import { generateRouteSvg } from '@/lib/routeRenderer';
 import {
   formatDistanceValue, formatTime, formatPaceValue,
-  formatElevation, formatDateShort, formatCalories, formatHeartRate,
+  formatElevation, formatDateShort, formatCalories, formatHeartRate, formatLaps,
 } from '@/lib/strava';
 import { GRID_SIZE, STORY_WIDTH, STORY_HEIGHT, type StatPosition } from '@/types';
 import RouteToolbar from '@/components/RouteToolbar';
@@ -366,10 +366,11 @@ export default function StoryPreview() {
       backgroundImage: debouncedConfig.backgroundImage,
       routeSvg,
       stats,
+      laps: selectedActivity?.laps ? formatLaps(selectedActivity.laps, units) : undefined,
       visibleStats: debouncedConfig.visibleStats,
       config: debouncedConfig,
     });
-  }, [debouncedConfig, routeSvg, stats]);
+  }, [debouncedConfig, routeSvg, stats, selectedActivity?.laps, units]);
 
   // Flash subtle indicator when preview updates
   useEffect(() => {
