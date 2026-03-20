@@ -145,6 +145,7 @@ export interface StoryConfig {
   lapsOffsetX: number;
   lapsOffsetY: number;
   lapsOpacity: number;
+  lapsScale: number;
   units: UnitSystem;
 }
 
