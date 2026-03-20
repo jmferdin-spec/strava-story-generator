@@ -370,7 +370,7 @@ export default function StoryPreview() {
       visibleStats: debouncedConfig.visibleStats,
       config: debouncedConfig,
     });
-  }, [debouncedConfig, routeSvg, stats, selectedActivity?.laps, units]);
+  }, [debouncedConfig, routeSvg, stats, selectedActivity?.laps]);
 
   // Flash subtle indicator when preview updates
   useEffect(() => {
