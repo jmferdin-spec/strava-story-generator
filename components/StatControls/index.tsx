@@ -107,6 +107,7 @@ export default function StatControls() {
     setTitleFontSize,
     setLapsOffsetX,
     setLapsOffsetY,
+    setLapsOpacity,
     setUnits,
     selectedActivity,
   } = useStoryStore();
@@ -295,6 +296,21 @@ export default function StatControls() {
                 </svg>
               }
             />
+            <SliderControl
+              label="Background"
+              value={config.lapsOpacity ?? 0.55}
+              min={0}
+              max={0.9}
+              step={0.05}
+              onChange={setLapsOpacity}
+              format={(v) => `${Math.round(v * 100)}%`}
+              icon={
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <circle cx="6" cy="6" r="4"/>
+                  <path d="M6 2v8"/>
+                </svg>
+              }
+            />
           </div>
           <p className="text-[10px] text-[#3A3A44] mt-2">
             Drag the splits box around the story.
@@ -374,7 +390,7 @@ export default function StatControls() {
             }
           />
         </div>
-        <p className="text-[10px] text-[#3A3A44] mt-2">
+        
           Adjust where the stat block appears on the story.
         </p>
       </div>
