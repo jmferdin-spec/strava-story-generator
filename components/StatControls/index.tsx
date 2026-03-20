@@ -390,7 +390,7 @@ export default function StatControls() {
             }
           />
         </div>
-        
+        <p className="text-[10px] text-[#3A3A44] mt-2">
           Adjust where the stat block appears on the story.
         </p>
       </div>
