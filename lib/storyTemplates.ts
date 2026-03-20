@@ -293,7 +293,7 @@ export function generateStoryHtml(data: StoryRenderData): string {
       z-index: 5;
       font-family: '${config.fontFamily}', sans-serif;
       width: 460px;
-      background: rgba(0,0,0,0.55);
+      background: rgba(0,0,0,${config.lapsOpacity ?? 0.55});
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border-radius: 20px;
