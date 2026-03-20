@@ -366,7 +366,7 @@ export default function StoryPreview() {
       backgroundImage: debouncedConfig.backgroundImage,
       routeSvg,
       stats,
-      laps: selectedActivity?.laps ? formatLaps(selectedActivity.laps, units) : undefined,
+      laps: selectedActivity?.laps ? formatLaps(selectedActivity.laps, debouncedConfig.units || 'imperial') : undefined,
       visibleStats: debouncedConfig.visibleStats,
       config: debouncedConfig,
     });
