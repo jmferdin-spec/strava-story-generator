@@ -236,8 +236,10 @@ export interface FormattedLap {
 }
 
 export function formatLaps(laps: StravaLap[], units: UnitSystem = 'imperial'): FormattedLap[] {
-  return laps.map((lap) => ({
-    index: lap.lap_index,
+  if (laps.length === 0) return [];
+  const runLaps = laps.filter((lap) => lap.average_speed >= 2.0);
+  return runLaps.map((lap, i) => ({
+    index: i + 1,
     distance: units === 'imperial'
       ? (lap.distance / METERS_PER_MILE).toFixed(2)
       : (lap.distance / 1000).toFixed(2),
