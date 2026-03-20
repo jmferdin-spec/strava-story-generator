@@ -142,6 +142,8 @@ export interface StoryConfig {
   statVerticalOffset: number;
   statHorizontalOffset: number;
   titleFontSize: number;
+  lapsOffsetX: number;
+  lapsOffsetY: number;
   units: UnitSystem;
 }
 

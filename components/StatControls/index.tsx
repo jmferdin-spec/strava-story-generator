@@ -105,6 +105,8 @@ export default function StatControls() {
     setStatVerticalOffset,
     setStatHorizontalOffset,
     setTitleFontSize,
+    setLapsOffsetX,
+    setLapsOffsetY,
     setUnits,
     selectedActivity,
   } = useStoryStore();
@@ -242,6 +244,60 @@ export default function StatControls() {
           />
           <p className="text-[10px] text-[#3A3A44] mt-2">
             Adjusts the run name shown at the top of the story.
+          </p>
+        </div>
+      )}
+
+      {/* Laps position (only when Laps is on) */}
+      {config.visibleStats.laps && (
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <p className="section-label" style={{ marginBottom: 0 }}>Splits Position</p>
+            <button
+              onClick={() => { setLapsOffsetX(50); setLapsOffsetY(50); }}
+              className="text-[10px] text-[#6B6B78] hover:text-[#FC4C02] transition-colors"
+            >
+              Reset
+            </button>
+          </div>
+          <div
+            className="p-3 rounded-xl space-y-4"
+            style={{
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.05)',
+            }}
+          >
+            <SliderControl
+              label="Horizontal"
+              value={config.lapsOffsetX ?? 50}
+              min={10}
+              max={90}
+              step={1}
+              onChange={setLapsOffsetX}
+              format={(v) => `${v}%`}
+              icon={
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M2 6h8M9 4l1.5 2-1.5 2M3 4L1.5 6 3 8"/>
+                </svg>
+              }
+            />
+            <SliderControl
+              label="Vertical"
+              value={config.lapsOffsetY ?? 50}
+              min={10}
+              max={90}
+              step={1}
+              onChange={setLapsOffsetY}
+              format={(v) => `${v}%`}
+              icon={
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M6 2v8M4 9l2 1.5L8 9M4 3l2-1.5L8 3"/>
+                </svg>
+              }
+            />
+          </div>
+          <p className="text-[10px] text-[#3A3A44] mt-2">
+            Drag the splits box around the story.
           </p>
         </div>
       )}

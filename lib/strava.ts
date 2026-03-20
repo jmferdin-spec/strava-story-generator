@@ -236,11 +236,8 @@ export interface FormattedLap {
 }
 
 export function formatLaps(laps: StravaLap[], units: UnitSystem = 'imperial'): FormattedLap[] {
-  if (laps.length === 0) return [];
-  // Filter out rest laps: anything slower than ~18:00/mi (1.5 m/s) is walking/standing
-  const runLaps = laps.filter((lap) => lap.average_speed >= 2.0);
-  return runLaps.map((lap, i) => ({
-    index: i + 1,
+  return laps.map((lap) => ({
+    index: lap.lap_index,
     distance: units === 'imperial'
       ? (lap.distance / METERS_PER_MILE).toFixed(2)
       : (lap.distance / 1000).toFixed(2),

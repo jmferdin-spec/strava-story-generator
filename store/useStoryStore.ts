@@ -66,6 +66,8 @@ interface StoryState {
   setStatVerticalOffset: (offset: number) => void;
   setStatHorizontalOffset: (offset: number) => void;
   setTitleFontSize: (size: number) => void;
+  setLapsOffsetX: (offset: number) => void;
+  setLapsOffsetY: (offset: number) => void;
 
   // Config — position (drag)
   setStatPosition: (pos: StatPosition) => void;
@@ -146,6 +148,8 @@ export const useStoryStore = create<StoryState>()(
     setStatVerticalOffset: (offset) => set((s) => { s.config.statVerticalOffset = offset; }),
     setStatHorizontalOffset: (offset) => set((s) => { s.config.statHorizontalOffset = offset; }),
     setTitleFontSize: (size) => set((s) => { s.config.titleFontSize = size; }),
+    setLapsOffsetX: (offset) => set((s) => { s.config.lapsOffsetX = offset; }),
+    setLapsOffsetY: (offset) => set((s) => { s.config.lapsOffsetY = offset; }),
 
     setStatPosition: (pos) => set((s) => { s.config.statPosition = pos; }),
     setUseAbsolutePosition: (use) => set((s) => { s.config.useAbsolutePosition = use; }),

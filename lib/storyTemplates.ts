@@ -43,6 +43,8 @@ export const DEFAULT_CONFIG: Omit<StoryConfig, 'activity'> = {
   statVerticalOffset: 75,
   statHorizontalOffset: 0,
   titleFontSize: 36,
+  lapsOffsetX: 50,
+  lapsOffsetY: 50,
   units: 'imperial',
 };
 
@@ -287,11 +289,15 @@ export function generateStoryHtml(data: StoryRenderData): string {
 
     .laps-block {
       position: absolute;
-      bottom: 160px;
-      left: 80px;
-      right: 80px;
       z-index: 5;
       font-family: '${config.fontFamily}', sans-serif;
+      width: 460px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 24px 28px;
+      border: 1px solid rgba(255,255,255,0.08);
     }
     .laps-title {
       font-size: ${Math.round(config.fontSize * 0.22)}px;
@@ -306,20 +312,20 @@ export function generateStoryHtml(data: StoryRenderData): string {
       border-collapse: collapse;
     }
     .laps-table th {
-      font-size: ${Math.round(config.fontSize * 0.18)}px;
+      font-size: ${Math.round(config.fontSize * 0.16)}px;
       font-weight: 400;
       color: ${config.labelColor};
       text-align: left;
-      padding: 6px 0;
+      padding: 4px 0;
       border-bottom: 1px solid rgba(255,255,255,0.1);
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
     .laps-table td {
-      font-size: ${Math.round(config.fontSize * 0.22)}px;
+      font-size: ${Math.round(config.fontSize * 0.2)}px;
       font-weight: ${config.fontWeight};
       color: ${config.statColor};
-      padding: 8px 0;
+      padding: 5px 0;
       border-bottom: 1px solid rgba(255,255,255,0.04);
     }
     .laps-table th:not(:first-child),
@@ -661,21 +667,22 @@ function getLapsHtml(
 ): string {
   const isImperial = config.units === 'imperial';
   const distUnit = isImperial ? 'mi' : 'km';
-  const paceUnit = isImperial ? '/mi' : '/km';
-  const maxLaps = Math.min(laps.length, 12); // cap at 12 to fit on screen
+  const maxLaps = Math.min(laps.length, 12);
   const displayLaps = laps.slice(0, maxLaps);
+  const lapsX = config.lapsOffsetX ?? 50;
+  const lapsY = config.lapsOffsetY ?? 50;
 
   const rows = displayLaps.map((lap) =>
     `<tr><td>${lap.index}</td><td>${lap.distance} ${distUnit}</td><td>${lap.pace}</td><td>${lap.time}</td></tr>`
   ).join('');
 
-  return `<div class="laps-block" style="text-align:${config.statAlignment}">
+  return `<div class="laps-block" style="left:${lapsX}%;top:${lapsY}%;transform:translate(-50%,-50%)">
     <div class="laps-title">Splits</div>
     <table class="laps-table">
-      <thead><tr><th>Lap</th><th>Dist</th><th>Pace</th><th>Time</th></tr></thead>
+      <thead><tr><th>#</th><th>Dist</th><th>Pace</th><th>Time</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    ${laps.length > maxLaps ? `<div style="font-size:${Math.round(config.fontSize * 0.16)}px;color:${config.labelColor};margin-top:8px;opacity:0.6">+${laps.length - maxLaps} more</div>` : ''}
+    ${laps.length > maxLaps ? `<div style="font-size:${Math.round(config.fontSize * 0.16)}px;color:${config.labelColor};margin-top:8px;opacity:0.6;text-align:center">+${laps.length - maxLaps} more</div>` : ''}
   </div>`;
 }
 
