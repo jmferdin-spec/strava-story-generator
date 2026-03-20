@@ -236,8 +236,13 @@ export interface FormattedLap {
 }
 
 export function formatLaps(laps: StravaLap[], units: UnitSystem = 'imperial'): FormattedLap[] {
-  return laps.map((lap) => ({
-    index: lap.lap_index,
+  if (laps.length === 0) return [];
+  // Find the fastest lap's speed to use as reference
+  const maxSpeed = Math.max(...laps.map((l) => l.average_speed));
+  // Filter out rest laps (less than 40% of fastest lap speed)
+  const runLaps = laps.filter((lap) => lap.average_speed >= maxSpeed * 0.4);
+  return runLaps.map((lap, i) => ({
+    index: i + 1,
     distance: units === 'imperial'
       ? (lap.distance / METERS_PER_MILE).toFixed(2)
       : (lap.distance / 1000).toFixed(2),
