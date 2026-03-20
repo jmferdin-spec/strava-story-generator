@@ -237,10 +237,8 @@ export interface FormattedLap {
 
 export function formatLaps(laps: StravaLap[], units: UnitSystem = 'imperial'): FormattedLap[] {
   if (laps.length === 0) return [];
-  // Find the fastest lap's speed to use as reference
-  const maxSpeed = Math.max(...laps.map((l) => l.average_speed));
-  // Filter out rest laps (less than 40% of fastest lap speed)
-  const runLaps = laps.filter((lap) => lap.average_speed >= maxSpeed * 0.4);
+  // Filter out rest laps: anything slower than ~18:00/mi (1.5 m/s) is walking/standing
+  const runLaps = laps.filter((lap) => lap.average_speed >= 1.5);
   return runLaps.map((lap, i) => ({
     index: i + 1,
     distance: units === 'imperial'
