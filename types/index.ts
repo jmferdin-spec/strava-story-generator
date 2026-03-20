@@ -9,6 +9,16 @@ export interface StravaAthlete {
   country: string;
 }
 
+export interface StravaLap {
+  lap_index: number;
+  distance: number;
+  moving_time: number;
+  elapsed_time: number;
+  average_speed: number;
+  average_heartrate?: number;
+  total_elevation_gain: number;
+}
+
 export interface StravaActivity {
   id: number;
   name: string;
@@ -24,6 +34,7 @@ export interface StravaActivity {
   max_heartrate?: number;
   calories?: number;
   description?: string;
+  laps?: StravaLap[];
   start_date: string;
   start_date_local: string;
   timezone: string;
@@ -96,6 +107,7 @@ export interface StatVisibility {
   calories: boolean;
   date: boolean;
   description: boolean;
+  laps: boolean;
 }
 
 export interface StoryConfig {

@@ -26,6 +26,7 @@ export const DEFAULT_CONFIG: Omit<StoryConfig, 'activity'> = {
     calories: true,
     date: true,
     description: true,
+    laps: false,
   },
   statAlignment: 'center',
   statPosition: { x: 540, y: 1440 },
@@ -193,6 +194,7 @@ export interface StoryRenderData {
     date: string;
     description: string;
   };
+  laps?: { index: number; distance: string; pace: string; time: string }[];
   visibleStats: {
     distance: boolean;
     time: boolean;
@@ -202,12 +204,13 @@ export interface StoryRenderData {
     calories: boolean;
     date: boolean;
     description: boolean;
+    laps: boolean;
   };
   config: StoryConfig;
 }
 
 export function generateStoryHtml(data: StoryRenderData): string {
-  const { backgroundImage, routeSvg, stats, visibleStats, config } = data;
+  const { backgroundImage, routeSvg, stats, laps, visibleStats, config } = data;
   const googleFontsUrl = getGoogleFontsUrl(config.fontFamily);
 
   const bgStyle = backgroundImage
@@ -282,6 +285,48 @@ export function generateStoryHtml(data: StoryRenderData): string {
       left: 0; right: 0;
     }
 
+    .laps-block {
+      position: absolute;
+      bottom: 160px;
+      left: 80px;
+      right: 80px;
+      z-index: 5;
+      font-family: '${config.fontFamily}', sans-serif;
+    }
+    .laps-title {
+      font-size: ${Math.round(config.fontSize * 0.22)}px;
+      font-weight: 600;
+      color: ${config.labelColor};
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .laps-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .laps-table th {
+      font-size: ${Math.round(config.fontSize * 0.18)}px;
+      font-weight: 400;
+      color: ${config.labelColor};
+      text-align: left;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .laps-table td {
+      font-size: ${Math.round(config.fontSize * 0.22)}px;
+      font-weight: ${config.fontWeight};
+      color: ${config.statColor};
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .laps-table th:not(:first-child),
+    .laps-table td:not(:first-child) {
+      text-align: right;
+    }
+
     .title-block {
       position: absolute;
       top: 140px;
@@ -318,6 +363,7 @@ export function generateStoryHtml(data: StoryRenderData): string {
     <div class="safe-zone">
       ${statBlockHtml}
     </div>
+    ${visibleStats.laps && laps && laps.length > 0 ? getLapsHtml(laps, config) : ''}
   </div>
 </body>
 </html>`;
@@ -604,6 +650,32 @@ function getAthletePosterStatBlock(
       ${visibleStats.calories && stats.calories !== '–' ? `<div><div class="stat-label">Calories</div><div class="stat-value" style="font-size:${config.fontSize * 0.65}px">${stats.calories}</div></div>` : ''}
     </div>
     ${visibleStats.date ? `<div class="stat-date" style="margin-top:28px;font-size:${config.fontSize * 0.24}px">${stats.date}</div>` : ''}
+  </div>`;
+}
+
+// ─── Laps Table ───────────────────────────────────────────────────────────────
+
+function getLapsHtml(
+  laps: { index: number; distance: string; pace: string; time: string }[],
+  config: StoryConfig
+): string {
+  const isImperial = config.units === 'imperial';
+  const distUnit = isImperial ? 'mi' : 'km';
+  const paceUnit = isImperial ? '/mi' : '/km';
+  const maxLaps = Math.min(laps.length, 12); // cap at 12 to fit on screen
+  const displayLaps = laps.slice(0, maxLaps);
+
+  const rows = displayLaps.map((lap) =>
+    `<tr><td>${lap.index}</td><td>${lap.distance} ${distUnit}</td><td>${lap.pace}</td><td>${lap.time}</td></tr>`
+  ).join('');
+
+  return `<div class="laps-block" style="text-align:${config.statAlignment}">
+    <div class="laps-title">Splits</div>
+    <table class="laps-table">
+      <thead><tr><th>Lap</th><th>Dist</th><th>Pace</th><th>Time</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    ${laps.length > maxLaps ? `<div style="font-size:${Math.round(config.fontSize * 0.16)}px;color:${config.labelColor};margin-top:8px;opacity:0.6">+${laps.length - maxLaps} more</div>` : ''}
   </div>`;
 }
 

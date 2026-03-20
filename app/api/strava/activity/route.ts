@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getActivityById, refreshAccessToken } from '@/lib/strava';
+import { getActivityById, getActivityLaps, refreshAccessToken } from '@/lib/strava';
 
 export async function GET(request: NextRequest) {
   const id = request.nextUrl.searchParams.get('id');
@@ -25,8 +25,11 @@ export async function GET(request: NextRequest) {
       const newTokenData = await refreshAccessToken(refreshToken);
       accessToken = newTokenData.access_token;
 
-      const activity = await getActivityById(accessToken, parseInt(id));
-      const response = NextResponse.json({ activity });
+      const [activity, laps] = await Promise.all([
+        getActivityById(accessToken, parseInt(id)),
+        getActivityLaps(accessToken, parseInt(id)),
+      ]);
+      const response = NextResponse.json({ activity: { ...activity, laps } });
 
       response.cookies.set('strava_access_token', newTokenData.access_token, {
         httpOnly: true,
@@ -45,14 +48,17 @@ export async function GET(request: NextRequest) {
       });
 
       return response;
-    } catch {
+    } catch (_err) {
       return NextResponse.json({ error: 'Failed to refresh token' }, { status: 401 });
     }
   }
 
   try {
-    const activity = await getActivityById(accessToken, parseInt(id));
-    return NextResponse.json({ activity });
+    const [activity, laps] = await Promise.all([
+      getActivityById(accessToken, parseInt(id)),
+      getActivityLaps(accessToken, parseInt(id)),
+    ]);
+    return NextResponse.json({ activity: { ...activity, laps } });
   } catch (err) {
     if (err instanceof Error && err.message === 'UNAUTHORIZED') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

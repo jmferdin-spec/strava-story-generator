@@ -6,7 +6,7 @@ import { generateStoryHtml } from '@/lib/storyTemplates';
 import { generateRouteSvg } from '@/lib/routeRenderer';
 import {
   formatDistanceValue, formatTime, formatPaceValue,
-  formatElevation, formatDateShort, formatCalories, formatHeartRate,
+  formatElevation, formatDateShort, formatCalories, formatHeartRate, formatLaps,
 } from '@/lib/strava';
 import type { UnitSystem } from '@/types';
 
@@ -14,7 +14,7 @@ const STORY_WIDTH = 1080;
 const STORY_HEIGHT = 1920;
 
 // Render story HTML to PNG blob in the browser
-async function renderStoryToPng(html: string, transparentBg: boolean = false): Promise<Blob> {
+async function renderStoryToPng(html: string): Promise<Blob> {
   const container = document.createElement('div');
   container.style.position = 'fixed';
   container.style.left = '0';
@@ -47,13 +47,6 @@ async function renderStoryToPng(html: string, transparentBg: boolean = false): P
 
   await document.fonts.ready;
   await new Promise((r) => setTimeout(r, 500));
-
- // If no background image, make export transparent
-    if (transparentBg) {
-      storyEl.style.background = 'transparent';
-      const overlay = storyEl.querySelector('.overlay') as HTMLElement;
-      if (overlay) overlay.style.background = 'transparent';
-    }
 
   try {
     const htmlToImage = await import('html-to-image');
@@ -116,15 +109,18 @@ function useStoryExport() {
       });
     }
 
+    const laps = activity?.laps ? formatLaps(activity.laps, units) : undefined;
+
     const html = generateStoryHtml({
       backgroundImage: config.backgroundImage,
       routeSvg,
       stats,
+      laps,
       visibleStats: config.visibleStats,
       config,
     });
 
-    const blob = await renderStoryToPng(html, !config.backgroundImage);
+    const blob = await renderStoryToPng(html);
 
     const activityName = selectedActivity?.name
       ? selectedActivity.name.replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 40)
@@ -190,7 +186,7 @@ export default function ExportButton({ fullWidth = false }: { fullWidth?: boolea
         await navigator.share({
           files: [file],
           title: 'My Strava Story',
-          text: 'Generated with StoryMiles',
+          text: 'Generated with StoryRun',
         });
         setShareState('success');
         setTimeout(() => setShareState('idle'), 3000);

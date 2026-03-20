@@ -1,4 +1,4 @@
-import type { StravaAthlete, StravaActivity, UnitSystem } from '@/types';
+import type { StravaAthlete, StravaActivity, StravaLap, UnitSystem } from '@/types';
 
 const STRAVA_API_BASE = 'https://www.strava.com/api/v3';
 const STRAVA_AUTH_URL = 'https://www.strava.com/oauth/authorize';
@@ -129,6 +129,13 @@ export async function getActivityById(
   return stravaFetch<StravaActivity>(`/activities/${activityId}`, accessToken);
 }
 
+export async function getActivityLaps(
+  accessToken: string,
+  activityId: number
+): Promise<StravaLap[]> {
+  return stravaFetch<StravaLap[]>(`/activities/${activityId}/laps`, accessToken);
+}
+
 // ─── Unit Conversion Constants ────────────────────────────────────────────────
 
 const METERS_PER_MILE = 1609.344;
@@ -219,6 +226,24 @@ export function formatCalories(calories: number): string {
 
 export function formatHeartRate(bpm: number): string {
   return `${Math.round(bpm)}`;
+}
+
+export interface FormattedLap {
+  index: number;
+  distance: string;
+  pace: string;
+  time: string;
+}
+
+export function formatLaps(laps: StravaLap[], units: UnitSystem = 'imperial'): FormattedLap[] {
+  return laps.map((lap) => ({
+    index: lap.lap_index,
+    distance: units === 'imperial'
+      ? (lap.distance / METERS_PER_MILE).toFixed(2)
+      : (lap.distance / 1000).toFixed(2),
+    pace: formatPaceValue(lap.average_speed, units),
+    time: formatTime(lap.moving_time),
+  }));
 }
 
 export function formatDate(dateString: string): string {
