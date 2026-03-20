@@ -46,6 +46,7 @@ export const DEFAULT_CONFIG: Omit<StoryConfig, 'activity'> = {
   lapsOffsetX: 50,
   lapsOffsetY: 50,
   lapsOpacity: 0.55,
+  lapsScale: 1,
   units: 'imperial',
 };
 
@@ -677,7 +678,8 @@ function getLapsHtml(
     `<tr><td>${lap.index}</td><td>${lap.distance} ${distUnit}</td><td>${lap.pace}</td><td>${lap.time}</td></tr>`
   ).join('');
 
-  return `<div class="laps-block" style="left:${lapsX}%;top:${lapsY}%;transform:translate(-50%,-50%)">
+  const scale = config.lapsScale ?? 1;
+  return `<div class="laps-block" style="left:${lapsX}%;top:${lapsY}%;transform:translate(-50%,-50%) scale(${scale})">
     <div class="laps-title">Splits</div>
     <table class="laps-table">
       <thead><tr><th>#</th><th>Dist</th><th>Pace</th><th>Time</th></tr></thead>
