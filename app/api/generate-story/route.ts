@@ -117,6 +117,7 @@ async function renderLocally(
   const backgroundImage = backgroundImageBase64 ?? config.backgroundImage;
   const html = generateStoryHtml({
     backgroundImage, routeSvg, stats,
+    laps: [],
     visibleStats: config.visibleStats,
     config: { ...config, backgroundImage },
   });
@@ -218,6 +219,7 @@ export async function GET(request: NextRequest) {
 
     const html = generateStoryHtml({
       backgroundImage: config.backgroundImage, routeSvg, stats,
+      laps: [],
       visibleStats: config.visibleStats, config,
     });
 
