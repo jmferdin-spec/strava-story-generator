@@ -45,6 +45,7 @@ export const DEFAULT_CONFIG: Omit<StoryConfig, 'activity'> = {
   titleFontSize: 36,
   lapsOffsetX: 50,
   lapsOffsetY: 50,
+  lapsOpacity: 0.55,
   units: 'imperial',
 };
 
