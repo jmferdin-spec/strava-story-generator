@@ -108,6 +108,7 @@ export default function StatControls() {
     setLapsOffsetX,
     setLapsOffsetY,
     setLapsOpacity,
+    setLapsScale,
     setUnits,
     selectedActivity,
   } = useStoryStore();
@@ -308,6 +309,20 @@ export default function StatControls() {
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                   <circle cx="6" cy="6" r="4"/>
                   <path d="M6 2v8"/>
+                </svg>
+              }
+            />
+            <SliderControl
+              label="Size"
+              value={config.lapsScale ?? 1}
+              min={0.5}
+              max={1.5}
+              step={0.05}
+              onChange={setLapsScale}
+              format={(v) => `${Math.round(v * 100)}%`}
+              icon={
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M2 10L10 2M10 2H6M10 2v4"/>
                 </svg>
               }
             />
