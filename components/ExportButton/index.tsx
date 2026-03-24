@@ -14,7 +14,7 @@ const STORY_WIDTH = 1080;
 const STORY_HEIGHT = 1920;
 
 // Render story HTML to PNG blob in the browser
-async function renderStoryToPng(html: string): Promise<Blob> {
+async function renderStoryToPng(html: string, transparentBg: boolean = false): Promise<Blob> {
   const container = document.createElement('div');
   container.style.position = 'fixed';
   container.style.left = '0';
@@ -47,6 +47,13 @@ async function renderStoryToPng(html: string): Promise<Blob> {
 
   await document.fonts.ready;
   await new Promise((r) => setTimeout(r, 500));
+
+  // If no background image, make export transparent
+    if (transparentBg) {
+      storyEl.style.background = 'transparent';
+      const overlay = storyEl.querySelector('.overlay') as HTMLElement;
+      if (overlay) overlay.style.background = 'transparent';
+    }
 
   try {
     const htmlToImage = await import('html-to-image');
@@ -120,7 +127,7 @@ function useStoryExport() {
       config,
     });
 
-    const blob = await renderStoryToPng(html);
+    const blob = await renderStoryToPng(html, !config.backgroundImage);
 
     const activityName = selectedActivity?.name
       ? selectedActivity.name.replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 40)
