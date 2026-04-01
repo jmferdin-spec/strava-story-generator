@@ -372,7 +372,7 @@ export function generateStoryHtml(data: StoryRenderData): string {
       ${statBlockHtml}
     </div>
     ${visibleStats.laps && laps && laps.length > 0 ? getLapsHtml(laps, config) : ''}
-    <img src="/storymiles-logo.png" style="position:absolute;bottom:40px;right:40px;height:28px;opacity:0.3;z-index:10;pointer-events:none" />
+    <img src="/storymiles-logo.png" style="position:absolute;bottom:40px;right:40px;height:36px;opacity:0.3;z-index:10;pointer-events:none" />
   </div>
 </body>
 </html>`;
