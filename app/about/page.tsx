@@ -188,16 +188,17 @@ export default function AboutPage() {
             consider buying me a coffee!
           </p>
           <a
-            href="https://venmo.com/joeferdin"
+            href="https://buymeacoffee.com/jmferdin"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium text-white transition-all hover:scale-105"
             style={{
-              background: 'linear-gradient(135deg, #008CFF 0%, #0070CC 100%)',
-              boxShadow: '0 4px 16px rgba(0,140,255,0.3)',
+              background: 'linear-gradient(135deg, #FFDD00 0%, #FF813F 100%)',
+              boxShadow: '0 4px 16px rgba(255,129,63,0.3)',
+              color: '#000',
             }}
           >
-            Donate via Venmo
+            Buy Me a Coffee ☕
           </a>
         </div>
 
