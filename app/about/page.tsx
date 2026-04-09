@@ -207,11 +207,11 @@ export default function AboutPage() {
             Created by <span className="text-[#E8E8EA]">Joe Ferdin</span>
           </p>
           <a
-            href="mailto:j_ferdin@hotmail.com"
+            href="mailto:ferdinlabs+storymiles@gmail.com"
             className="text-sm transition-colors hover:text-white mt-1 inline-block"
             style={{ color: '#FC4C02' }}
           >
-            j_ferdin@hotmail.com
+            ferdinlabs+storymiles@gmail.com
           </a>
           <div className="flex items-center justify-center gap-4 mt-4">
             <a
