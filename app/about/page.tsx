@@ -187,17 +187,17 @@ export default function AboutPage() {
             StoryMiles is free to use. If you enjoy it and want to help keep it running,
             consider buying me a coffee!
           </p>
-          <a href="https://buymeacoffee.com/jmferdin"
+          <a href="https://ko-fi.com/S6S61YLYW1"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all hover:scale-105"
             style={{
-              background: 'linear-gradient(135deg, #FFDD00 0%, #FF813F 100%)',
-              boxShadow: '0 4px 16px rgba(255,129,63,0.3)',
-              color: '#000',
+              background: 'linear-gradient(135deg, #FF5E5B 0%, #E53935 100%)',
+              boxShadow: '0 4px 16px rgba(229,57,53,0.3)',
+              color: '#fff',
             }}
           >
-            Buy Me a Coffee ☕
+            Support me on Ko-fi ☕
           </a>
         </div>
 
