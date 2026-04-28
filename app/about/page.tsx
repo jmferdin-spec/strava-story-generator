@@ -187,7 +187,18 @@ export default function AboutPage() {
             StoryMiles is free to use. If you enjoy it and want to help keep it running,
             consider buying me a coffee!
           </p>
-          <a href='https://ko-fi.com/S6S61YLYW1' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+          <a href="https://buymeacoffee.com/jmferdin"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, #FFDD00 0%, #FF813F 100%)',
+              boxShadow: '0 4px 16px rgba(255,129,63,0.3)',
+              color: '#000',
+            }}
+          >
+            Buy Me a Coffee ☕
+          </a>
         </div>
 
         <div className="text-center pb-8">
